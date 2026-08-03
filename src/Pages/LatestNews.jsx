@@ -50,7 +50,7 @@ function LatestNews() {
       icon={<Megaphone className="h-5 w-5" />}
       title="LATEST NEWS"
     >
-      <div className="h-[420px] overflow-hidden">
+      <div className="h-105 overflow-hidden">
 
         <marquee
           direction="up"
