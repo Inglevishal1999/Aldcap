@@ -9,7 +9,7 @@ import Blog from "./Components/Blog";
 import Contact from "./Components/Contact";
 import Header from "./components/Header";
 import Navbar from "./Components/Navbar";
-import Footer from "./components/Footer";
+import Footer from "./Components/Footer";
 
 function App() {
   return (
