@@ -47,14 +47,13 @@ function LatestNews() {
 
   return (
     <CardShell
-      icon={<Megaphone className="h-5 w-5" />}
+      icon={<Megaphone className="w-5 h-5" />}
       title="LATEST NEWS"
     >
-      <div className="h-105 overflow-hidden">
-
+      <div className="h-[420px] sm:h-[450px] md:h-[500px] overflow-hidden">
         <marquee
           direction="up"
-          scrollamount="2"
+          scrollAmount="2"
           className="h-full"
           onMouseOver={(e) => e.target.stop()}
           onMouseOut={(e) => e.target.start()}
@@ -62,40 +61,37 @@ function LatestNews() {
           {news.map((item) => (
             <div
               key={item.id}
-              className="border-b p-4 hover:bg-gray-50 transition"
+              className="border-b border-gray-200 p-4 sm:p-5 hover:bg-gray-50 transition-all duration-300"
             >
               {/* Date */}
-              <div className="flex items-center gap-2 text-red-600 text-sm font-semibold">
-
-                <CalendarClock className="w-4 h-4" />
+              <div className="flex flex-wrap items-center gap-2 text-red-600 text-xs sm:text-sm font-semibold">
+                <CalendarClock className="w-4 h-4 flex-shrink-0" />
 
                 <span>{item.date}</span>
 
-                <span className="bg-red-600 text-white text-[10px] px-2 py-1 rounded">
+                <span className="rounded bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white whitespace-nowrap">
                   NEW
                 </span>
-
               </div>
 
               {/* Title */}
-              <h3 className="mt-3 text-lg font-bold text-blue-900">
+              <h3 className="mt-3 text-base sm:text-lg md:text-xl font-bold text-blue-900 leading-snug">
                 {item.title}
               </h3>
 
               {/* Description */}
-              <p className="mt-2 text-gray-600 text-sm leading-6">
+              <p className="mt-2 text-sm sm:text-[15px] text-gray-600 leading-6">
                 {item.description}
               </p>
 
               {/* Read More */}
-              <button className="mt-4 flex items-center gap-2 text-blue-700 hover:text-orange-500 font-semibold">
+              <button className="mt-4 inline-flex items-center gap-2 text-sm sm:text-base font-semibold text-blue-700 hover:text-orange-500 transition-colors">
                 Read More
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           ))}
         </marquee>
-
       </div>
     </CardShell>
   );

@@ -1,9 +1,14 @@
 import ImageGallery from "../Pages/ImageGallery";
 import LatestNews from "../Pages/LatestNews";
 import DutyRoster from "../Pages/DutyRoster";
+import HeroSlider from "./HeroSlider";
 
 function InformationSection() {
   return (
+    <>
+    <section>
+        <HeroSlider/>
+    </section>
     <section className="bg-gray-100 py-10 sm:py-12 lg:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Heading */}
@@ -25,6 +30,7 @@ function InformationSection() {
         </div>
       </div>
     </section>
+    </>
   );
 }
 

@@ -1,0 +1,22 @@
+import Header from "../components/Header";
+import Navbar from "../components/Navbar";
+import BlogSection from "../components/BlogSection";
+import Footer from "../components/Footer";
+
+function Blog() {
+  return (
+    <>
+
+      <div className="bg-blue-900 py-16 text-center text-white">
+        <h1 className="text-4xl font-bold">Our Blogs</h1>
+        <p className="mt-3">
+          Latest News, Electrical Safety & Industry Updates
+        </p>
+      </div>
+
+      <BlogSection />
+      </>
+  );
+}
+
+export default Blog;
