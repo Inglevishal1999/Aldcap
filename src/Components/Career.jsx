@@ -1,5 +1,16 @@
 import React from 'react'
 
+<<<<<<< HEAD
+const Career = () => {
+  return (
+    <div>
+      carrer page
+    </div>
+  )
+}
+
+export default Career
+=======
 function Career() {
   return (
     <div>Career</div>
@@ -7,3 +18,4 @@ function Career() {
 }
 
 export default Career
+>>>>>>> main

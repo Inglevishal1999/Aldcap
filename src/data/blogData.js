@@ -1,10 +1,18 @@
+<<<<<<< HEAD
+
+=======
+>>>>>>> main
 import blog1 from "../assets/blog1.jpeg";
 import blog2 from "../assets/blog2.jpeg";
 import blog3 from "../assets/blog3.jpeg";
 import blog4 from "../assets/blog4.jpeg";
 import blog5 from "../assets/blog5.jpeg";
+<<<<<<< HEAD
+import blog6 from "../assets/blog6.jpeg";
+=======
 import blog6 from "../assets/blog6_files/98791af6-a678-4b4a-ae3f-12cfe4ca540b.png";
 
+>>>>>>> main
 export const blogData = [
   {
     id: 1,
@@ -15,7 +23,10 @@ export const blogData = [
     description:
       "Heavy rainfall increases the risk of electrical hazards. Learn practical safety measures to protect your family, home, and electrical appliances during the monsoon season.",
   },
+<<<<<<< HEAD
+=======
 
+>>>>>>> main
   {
     id: 2,
     image: blog2,
@@ -25,7 +36,10 @@ export const blogData = [
     description:
       "The newly commissioned 132KV substation strengthens the regional power distribution network, improves reliability, and supports growing electricity demand.",
   },
+<<<<<<< HEAD
+=======
 
+>>>>>>> main
   {
     id: 3,
     image: blog3,
@@ -35,7 +49,10 @@ export const blogData = [
     description:
       "Simple energy-saving habits and efficient electrical appliances can significantly reduce your monthly electricity consumption without compromising comfort.",
   },
+<<<<<<< HEAD
+=======
 
+>>>>>>> main
   {
     id: 4,
     image: blog4,
@@ -45,7 +62,10 @@ export const blogData = [
     description:
       "Routine preventive maintenance improves equipment reliability, minimizes unexpected failures, and extends the operational life of electrical systems.",
   },
+<<<<<<< HEAD
+=======
 
+>>>>>>> main
   {
     id: 5,
     image: blog5,
@@ -55,7 +75,10 @@ export const blogData = [
     description:
       "Smart grid technology enables real-time monitoring, faster fault detection, improved efficiency, and better power management across the electrical network.",
   },
+<<<<<<< HEAD
+=======
 
+>>>>>>> main
   {
     id: 6,
     image: blog6,
@@ -65,4 +88,8 @@ export const blogData = [
     description:
       "Our awareness initiative educates consumers about electrical safety, responsible energy usage, and preventive measures to reduce electrical accidents.",
   },
+<<<<<<< HEAD
 ];
+=======
+];
+>>>>>>> main
