@@ -2,10 +2,8 @@ import ImageGallery from "../Pages/ImageGallery";
 import LatestNews from "../Pages/LatestNews";
 import DutyRoster from "../Pages/DutyRoster";
 import HeroSlider from "./HeroSlider";
-<<<<<<< HEAD
-=======
 
->>>>>>> main
+
 function InformationSection() {
   return (
     <>
@@ -19,18 +17,10 @@ function InformationSection() {
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-900">
             Information & Updates
           </h2>
-<<<<<<< HEAD
-=======
-
->>>>>>> main
           <p className="mt-3 text-sm sm:text-base text-gray-600">
             Gallery, Latest News & Employee Duty Schedule
           </p>
         </div>
-<<<<<<< HEAD
-=======
-
->>>>>>> main
         {/* Three Equal Columns */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           <ImageGallery />
@@ -42,8 +32,4 @@ function InformationSection() {
     </>
   );
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> main
 export default InformationSection;
