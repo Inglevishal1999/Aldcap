@@ -1,8 +1,8 @@
 
-import Header from "../components/Header";
-import Navbar from "../components/Navbar";
-import BlogSection from "../components/BlogSection";
-import Footer from "../components/Footer";
+import Header from "../Components/Header";
+import Navbar from "../Components/Navbar";
+import BlogSection from "../Components/BlogSection";
+import Footer from "../Components/Footer";
 
 function Blog() {
   return (
