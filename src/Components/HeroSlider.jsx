@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import { FaArrowRight } from "react-icons/fa";
@@ -10,117 +11,103 @@ import image1 from "../assets/image1.jpg";
 import image2 from "../assets/image2.jpg";
 import image3 from "../assets/Image3.jpg";
 
+const slides = [
+  {
+    image: image1,
+    title: (
+      <>
+        Powering <br />
+        A <span className="text-yellow-400">Brighter</span> Tomorrow
+      </>
+    ),
+    description:
+      "Reliable. Sustainable. Innovative. Delivering trusted electrical infrastructure for industries, businesses and communities.",
+    button: "Explore Services",
+  },
+  {
+    image: image2,
+    title: (
+      <>
+        Smart <br />
+        <span className="text-yellow-400">Energy</span> Solutions
+      </>
+    ),
+    description:
+      "We provide high-quality electrical installations, maintenance, transmission and renewable energy solutions.",
+    button: "Learn More",
+  },
+  {
+    image: image3,
+    title: (
+      <>
+        Building <br />
+        A <span className="text-yellow-400">Greener</span> Future
+      </>
+    ),
+    description:
+      "Clean energy, reliable power distribution and sustainable electrical engineering for tomorrow.",
+    button: "Contact Us",
+  },
+];
+
 function HeroSlider() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   return (
     <Swiper
       modules={[Navigation, Pagination, Autoplay]}
-      navigation
+      navigation={!isMobile}
       pagination={{ clickable: true }}
       autoplay={{
         delay: 4000,
         disableOnInteraction: false,
       }}
       loop={true}
-      className="w-full"
+      className="hero-slider w-full"
     >
-      {/* ================= Slide 1 ================= */}
-      <SwiperSlide>
-        <div
-          className="relative h-[75vh] bg-cover bg-center flex items-center"
-          style={{ backgroundImage: `url(${image1})` }}
-        >
-          {/* Blue Overlay */}
-          <div className="absolute inset-0 bg-linear-to-r from-blue-950/90 via-blue-900/70 to-transparent"></div>
+      {slides.map((slide, index) => (
+        <SwiperSlide key={index}>
+          <div
+            className="relative min-h-[60vh] sm:min-h-[70vh] md:min-h-[80vh] lg:min-h-[90vh] bg-cover bg-center flex items-center"
+            style={{
+              backgroundImage: `url(${slide.image})`,
+            }}
+          >
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-950/90 via-blue-900/70 to-transparent"></div>
 
-          <div className="relative z-10 max-w-7xl mx-auto w-full px-6 md:px-12">
-            <div className="max-w-2xl">
+            {/* Content */}
+            <div className="relative z-10 max-w-7xl mx-auto w-full px-5 sm:px-8 md:px-12 lg:px-16">
+              <div className="max-w-xl lg:max-w-2xl">
+                <h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold uppercase leading-tight">
+                  {slide.title}
+                </h1>
 
-              <h1 className="text-white text-4xl md:text-6xl font-extrabold leading-tight uppercase">
-                Powering <br />
-                A <span className="text-yellow-400">Brighter</span> Tomorrow
-              </h1>
+                <p className="mt-4 sm:mt-6 text-sm sm:text-base md:text-lg lg:text-xl text-gray-200 leading-relaxed">
+                  {slide.description}
+                </p>
 
-              <p className="mt-6 text-lg text-gray-200">
-                Reliable. Sustainable. Innovative.
-                Delivering trusted electrical infrastructure for
-                industries, businesses and communities.
-              </p>
-
-              <button className="mt-8 flex items-center gap-3 bg-blue-700 hover:bg-blue-800 px-7 py-4 rounded-md text-white font-semibold transition duration-300">
-                Explore Services
-                <FaArrowRight />
-              </button>
-
+                <button className="mt-6 sm:mt-8 inline-flex items-center gap-3 bg-blue-700 hover:bg-blue-800 px-5 sm:px-6 md:px-7 py-3 sm:py-4 rounded-md text-white text-sm sm:text-base font-semibold transition duration-300">
+                  {slide.button}
+                  <FaArrowRight />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </SwiperSlide>
-
-      {/* ================= Slide 2 ================= */}
-      <SwiperSlide>
-        <div
-          className="relative h-[75vh] bg-cover bg-center flex items-center"
-          style={{ backgroundImage: `url(${image2})` }}
-        >
-          <div className="absolute inset-0 bg-linear-to-r from-blue-950/90 via-blue-900/70 to-transparent"></div>
-
-          <div className="relative z-10 max-w-7xl mx-auto w-full px-6 md:px-12">
-
-            <div className="max-w-2xl">
-
-              <h1 className="text-white text-4xl md:text-6xl font-extrabold leading-tight uppercase">
-                Smart <br />
-                <span className="text-yellow-400">Energy</span> Solutions
-              </h1>
-
-              <p className="mt-6 text-lg text-gray-200">
-                We provide high-quality electrical installations,
-                maintenance, transmission and renewable energy solutions.
-              </p>
-
-              <button className="mt-8 flex items-center gap-3 bg-blue-700 hover:bg-blue-800 px-7 py-4 rounded-md text-white font-semibold transition">
-                Learn More
-                <FaArrowRight />
-              </button>
-
-            </div>
-
-          </div>
-        </div>
-      </SwiperSlide>
-
-      {/* ================= Slide 3 ================= */}
-      <SwiperSlide>
-        <div
-          className="relative h-[75vh] bg-cover bg-center flex items-center"
-          style={{ backgroundImage: `url(${image3})` }}
-        >
-          <div className="absolute inset-0 bg-linear-to-r from-blue-950/90 via-blue-900/70 to-transparent"></div>
-
-          <div className="relative z-10 max-w-7xl mx-auto w-full px-6 md:px-12">
-
-            <div className="max-w-2xl">
-
-              <h1 className="text-white text-4xl md:text-6xl font-extrabold leading-tight uppercase">
-                Building <br />
-                A <span className="text-yellow-400">Greener</span> Future
-              </h1>
-
-              <p className="mt-6 text-lg text-gray-200">
-                Clean energy, reliable power distribution and
-                sustainable electrical engineering for tomorrow.
-              </p>
-
-              <button className="mt-8 flex items-center gap-3 bg-blue-700 hover:bg-blue-800 px-7 py-4 rounded-md text-white font-semibold transition">
-                Contact Us
-                <FaArrowRight />
-              </button>
-
-            </div>
-
-          </div>
-        </div>
-      </SwiperSlide>
+        </SwiperSlide>
+      ))}
     </Swiper>
   );
 }
