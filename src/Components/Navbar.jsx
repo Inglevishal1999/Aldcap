@@ -5,21 +5,33 @@ import {
   FaUserCircle,
   FaBars,
   FaTimes,
+  FaChevronDown,
+  FaChevronUp,
 } from "react-icons/fa";
 import logo from "../assets/hero.png";
+import { useLocation } from "react-router-dom";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [servicesOpen, setServicesOpen] = useState(false);
+  const [safetyOpen, setSafetyOpen] = useState(false);
+  const location = useLocation();
 
-  const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "About", path: "/about" },
-    { name: "Services", path: "/services" },
-    { name: "Blog", path: "/blog" },
-    { name: "Consumers", path: "/consumers" },
-    { name: "Careers", path: "/careers" },
-    { name: "News", path: "/news" },
-    { name: "Contact", path: "/contact" },
+  const services = [
+    "Electrical Installation",
+    "Power Distribution",
+    "Solar Solutions",
+    "Industrial Automation",
+    "Maintenance",
+    "Emergency Support",
+  ];
+
+  const safety = [
+    "Safety Guidelines",
+    "PPE Standards",
+    "Emergency Procedures",
+    "Training Programs",
+    "Safety Documents",
   ];
 
   return (
@@ -32,15 +44,14 @@ function Navbar() {
             <NavLink to="/" className="flex items-center gap-3">
               <img
                 src={logo}
-                alt="ALDC Electrical"
+                alt="VoltEdge Energy"
                 className="w-12 h-12 sm:w-14 sm:h-14 object-contain"
               />
 
               <div>
                 <h1 className="text-lg sm:text-2xl font-bold text-blue-900">
-                  ALDC Electrical
+                  VoltEdge Energy
                 </h1>
-
                 <p className="text-[10px] sm:text-xs text-gray-500">
                   Powering The Future
                 </p>
@@ -49,20 +60,118 @@ function Navbar() {
 
             {/* Desktop Menu */}
             <ul className="hidden lg:flex items-center gap-8 font-semibold">
-              {navLinks.map((item) => (
-                <li key={item.name}>
-                  <NavLink
-                    to={item.path}
-                    className={({ isActive }) =>
-                      isActive
-                        ? "text-blue-700 border-b-2 border-yellow-400 pb-1"
-                        : "text-gray-700 hover:text-blue-700 transition"
-                    }
-                  >
-                    {item.name}
-                  </NavLink>
-                </li>
-              ))}
+              <li>
+                <NavLink
+                  to="/"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "text-blue-700 border-b-2 border-yellow-400 pb-1"
+                      : "text-gray-700 hover:text-blue-700 transition"
+                  }
+                >
+                  Home
+                </NavLink>
+              </li>
+
+              <li>
+                <NavLink
+                  to="/about"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "text-blue-700 border-b-2 border-yellow-400 pb-1"
+                      : "text-gray-700 hover:text-blue-700 transition"
+                  }
+                >
+                  About Us
+                </NavLink>
+              </li>
+
+              {/* Services Dropdown */}
+              <li className="relative group">
+                <button className="flex items-center gap-1 text-gray-700 hover:text-blue-700 transition">
+                  Services <FaChevronDown className="text-xs" />
+                </button>
+
+                <div className="absolute left-0 mt-3 w-64 bg-white rounded-lg shadow-xl border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                  {services.map((item) => (
+                    <a
+                      key={item}
+                      href="#"
+                      className="block px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 border-b last:border-b-0"
+                    >
+                      {item}
+                    </a>
+                  ))}
+                </div>
+              </li>
+
+              {/* Safety Dropdown */}
+              <li className="relative group">
+                <NavLink
+                  to="/services"
+                  className={`pb-1 transition ${
+                    location.pathname.startsWith("/services")
+                      ? "text-blue-700 border-b-2 border-yellow-400"
+                      : "text-gray-700 hover:text-blue-700"
+                  }`}
+                >
+                  Services
+                </NavLink>
+
+                {/* Dropdown */}
+              </li>
+
+              <li>
+                <NavLink
+                  to="/gallery"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "text-blue-700 border-b-2 border-yellow-400 pb-1"
+                      : "text-gray-700 hover:text-blue-700 transition"
+                  }
+                >
+                  Gallery
+                </NavLink>
+              </li>
+
+              <li>
+                <NavLink
+                  to="/blog"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "text-blue-700 border-b-2 border-yellow-400 pb-1"
+                      : "text-gray-700 hover:text-blue-700 transition"
+                  }
+                >
+                  Blog
+                </NavLink>
+              </li>
+
+              <li>
+                <NavLink
+                  to="/news"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "text-blue-700 border-b-2 border-yellow-400 pb-1"
+                      : "text-gray-700 hover:text-blue-700 transition"
+                  }
+                >
+                  News
+                </NavLink>
+              </li>
+
+              <li>
+                <NavLink
+                  to="/contact"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "text-blue-700 border-b-2 border-yellow-400 pb-1"
+                      : "text-gray-700 hover:text-blue-700 transition"
+                  }
+                >
+                  Contact
+                </NavLink>
+              </li>
             </ul>
 
             {/* Desktop Right */}
@@ -92,25 +201,19 @@ function Navbar() {
       <div
         onClick={() => setMenuOpen(false)}
         className={`fixed inset-0 bg-black/40 z-40 transition-opacity duration-300 lg:hidden ${
-          menuOpen
-            ? "opacity-100 visible"
-            : "opacity-0 invisible"
+          menuOpen ? "opacity-100 visible" : "opacity-0 invisible"
         }`}
       />
 
       {/* Mobile Drawer */}
       <div
-        className={`fixed top-0 right-0 h-screen w-72 bg-white shadow-2xl z-50 transform transition-transform duration-300 lg:hidden ${
-          menuOpen
-            ? "translate-x-0"
-            : "translate-x-full"
+        className={`fixed top-0 right-0 h-screen w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 lg:hidden ${
+          menuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Drawer Header */}
         <div className="flex items-center justify-between h-20 px-5 border-b">
-          <h2 className="text-xl font-bold text-blue-800">
-            Menu
-          </h2>
+          <h2 className="text-xl font-bold text-blue-800">Menu</h2>
 
           <button
             onClick={() => setMenuOpen(false)}
@@ -120,26 +223,101 @@ function Navbar() {
           </button>
         </div>
 
-        {/* Mobile Menu */}
-        <ul className="mt-2">
-          {navLinks.map((item) => (
-            <li key={item.name}>
-              <NavLink
-                to={item.path}
-                onClick={() => setMenuOpen(false)}
-                className={({ isActive }) =>
-                  `block px-6 py-4 border-b transition ${
-                    isActive
-                      ? "bg-blue-50 text-blue-700 font-semibold"
-                      : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
-                  }`
-                }
-              >
-                {item.name}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
+        <div className="overflow-y-auto h-[calc(100%-160px)]">
+          <NavLink
+            to="/"
+            onClick={() => setMenuOpen(false)}
+            className="block px-6 py-4 border-b hover:bg-blue-50"
+          >
+            Home
+          </NavLink>
+
+          <NavLink
+            to="/about"
+            onClick={() => setMenuOpen(false)}
+            className="block px-6 py-4 border-b hover:bg-blue-50"
+          >
+            About Us
+          </NavLink>
+
+          {/* Mobile Services */}
+          <button
+            onClick={() => setServicesOpen(!servicesOpen)}
+            className="w-full flex items-center justify-between px-6 py-4 border-b hover:bg-blue-50"
+          >
+            <span>Services</span>
+            {servicesOpen ? <FaChevronUp /> : <FaChevronDown />}
+          </button>
+
+          {servicesOpen && (
+            <div className="bg-gray-50">
+              {services.map((item) => (
+                <a
+                  key={item}
+                  href="#"
+                  className="block px-10 py-3 text-sm text-gray-700 hover:bg-blue-100"
+                >
+                  {item}
+                </a>
+              ))}
+            </div>
+          )}
+
+          {/* Mobile Safety */}
+          <button
+            onClick={() => setSafetyOpen(!safetyOpen)}
+            className="w-full flex items-center justify-between px-6 py-4 border-b hover:bg-blue-50"
+          >
+            <span>Safety</span>
+            {safetyOpen ? <FaChevronUp /> : <FaChevronDown />}
+          </button>
+
+          {safetyOpen && (
+            <div className="bg-gray-50">
+              {safety.map((item) => (
+                <a
+                  key={item}
+                  href="#"
+                  className="block px-10 py-3 text-sm text-gray-700 hover:bg-blue-100"
+                >
+                  {item}
+                </a>
+              ))}
+            </div>
+          )}
+
+          <NavLink
+            to="/gallery"
+            onClick={() => setMenuOpen(false)}
+            className="block px-6 py-4 border-b hover:bg-blue-50"
+          >
+            Gallery
+          </NavLink>
+
+          <NavLink
+            to="/blog"
+            onClick={() => setMenuOpen(false)}
+            className="block px-6 py-4 border-b hover:bg-blue-50"
+          >
+            Blog
+          </NavLink>
+
+          <NavLink
+            to="/news"
+            onClick={() => setMenuOpen(false)}
+            className="block px-6 py-4 border-b hover:bg-blue-50"
+          >
+            News
+          </NavLink>
+
+          <NavLink
+            to="/contact"
+            onClick={() => setMenuOpen(false)}
+            className="block px-6 py-4 border-b hover:bg-blue-50"
+          >
+            Contact
+          </NavLink>
+        </div>
 
         {/* Bottom Buttons */}
         <div className="absolute bottom-5 left-0 right-0 px-5 space-y-3">

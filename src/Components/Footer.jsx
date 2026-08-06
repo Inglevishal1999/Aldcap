@@ -60,7 +60,7 @@ function Footer() {
 
               <div className="flex gap-3">
                 <FaMapMarkerAlt className="text-yellow-400 mt-1" />
-                <span>Nagpur, Maharashtra, India</span>
+                <span>Ambazari, Nagpur, Maharashtra</span>
               </div>
 
               <div className="flex gap-3">
@@ -143,7 +143,7 @@ function Footer() {
 
               <div className="flex gap-3">
                 <FaMapMarkerAlt className="text-yellow-400 mt-1" />
-                <span>Nagpur, Maharashtra, India</span>
+                <span>Ambazari, Nagpur, Maharashtra, India</span>
               </div>
 
               <div className="flex gap-3">
