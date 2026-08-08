@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom";
 import {
   FaPhoneAlt,
   FaEnvelope,
@@ -10,14 +11,17 @@ import {
 } from "react-icons/fa";
 
 function Footer() {
+  // label -> route. Keep this in sync with the <Routes> in App.jsx.
   const quickLinks = [
-    "Home",
-    "About",
-    "Services",
-    "Blog",
-    "Consumers",
-    "Careers",
-    "Contact",
+    { label: "Home", path: "/" },
+    { label: "About", path: "/about" },
+    { label: "Services", path: "/services" },
+    { label: "Blog", path: "/blog" },
+    // "Consumers" has no route yet — App.jsx has it commented out.
+    // Uncomment the route there, then swap this back to a NavLink:
+    // { label: "Consumers", path: "/consumers" },
+    { label: "Careers", path: "/careers" },
+    { label: "Contact", path: "/contact" },
   ];
 
   const services = [
@@ -65,12 +69,16 @@ function Footer() {
 
               <div className="flex gap-3">
                 <FaPhoneAlt className="text-yellow-400 mt-1" />
-                <span>1800 123 4567</span>
+                <a href="tel:+18001234567" className="hover:text-yellow-400 transition">
+                  1800 123 4567
+                </a>
               </div>
 
               <div className="flex gap-3">
                 <FaEnvelope className="text-yellow-400 mt-1" />
-                <span>info@aldcelectrical.com</span>
+                <a href="mailto:info@aldcelectrical.com" className="hover:text-yellow-400 transition">
+                  info@aldcelectrical.com
+                </a>
               </div>
 
             </div>
@@ -84,12 +92,18 @@ function Footer() {
 
             <ul className="space-y-3">
               {quickLinks.map((item) => (
-                <li
-                  key={item}
-                  className="flex items-center gap-2 hover:text-yellow-400 cursor-pointer transition"
-                >
-                  <FaArrowRight className="text-xs" />
-                  {item}
+                <li key={item.label}>
+                  <NavLink
+                    to={item.path}
+                    className={({ isActive }) =>
+                      `flex items-center gap-2 transition ${
+                        isActive ? "text-yellow-400" : "hover:text-yellow-400"
+                      }`
+                    }
+                  >
+                    <FaArrowRight className="text-xs" />
+                    {item.label}
+                  </NavLink>
                 </li>
               ))}
             </ul>
@@ -103,12 +117,14 @@ function Footer() {
 
             <ul className="space-y-3">
               {services.map((item) => (
-                <li
-                  key={item}
-                  className="flex items-center gap-2 hover:text-yellow-400 cursor-pointer transition"
-                >
-                  <FaArrowRight className="text-xs" />
-                  {item}
+                <li key={item}>
+                  <NavLink
+                    to="/services"
+                    className="flex items-center gap-2 hover:text-yellow-400 transition"
+                  >
+                    <FaArrowRight className="text-xs" />
+                    {item}
+                  </NavLink>
                 </li>
               ))}
             </ul>
@@ -148,12 +164,16 @@ function Footer() {
 
               <div className="flex gap-3">
                 <FaPhoneAlt className="text-yellow-400 mt-1" />
-                <span>1800 123 4567</span>
+                <a href="tel:+18001234567" className="hover:text-yellow-400 transition">
+                  1800 123 4567
+                </a>
               </div>
 
               <div className="flex gap-3">
                 <FaEnvelope className="text-yellow-400 mt-1" />
-                <span>info@aldcelectrical.com</span>
+                <a href="mailto:info@aldcelectrical.com" className="hover:text-yellow-400 transition">
+                  info@aldcelectrical.com
+                </a>
               </div>
 
             </div>
@@ -173,12 +193,18 @@ function Footer() {
               <ul className="space-y-3 text-sm">
 
                 {quickLinks.map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-center gap-2 hover:text-yellow-400"
-                  >
-                    <FaArrowRight className="text-xs" />
-                    {item}
+                  <li key={item.label}>
+                    <NavLink
+                      to={item.path}
+                      className={({ isActive }) =>
+                        `flex items-center gap-2 transition ${
+                          isActive ? "text-yellow-400" : "hover:text-yellow-400"
+                        }`
+                      }
+                    >
+                      <FaArrowRight className="text-xs" />
+                      {item.label}
+                    </NavLink>
                   </li>
                 ))}
 
@@ -196,12 +222,14 @@ function Footer() {
               <ul className="space-y-3 text-sm">
 
                 {services.map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-center gap-2 hover:text-yellow-400"
-                  >
-                    <FaArrowRight className="text-xs" />
-                    {item}
+                  <li key={item}>
+                    <NavLink
+                      to="/services"
+                      className="flex items-center gap-2 hover:text-yellow-400 transition"
+                    >
+                      <FaArrowRight className="text-xs" />
+                      {item}
+                    </NavLink>
                   </li>
                 ))}
 

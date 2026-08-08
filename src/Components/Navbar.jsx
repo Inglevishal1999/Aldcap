@@ -7,14 +7,17 @@ import {
   FaTimes,
   FaChevronDown,
   FaChevronUp,
+  FaSignOutAlt,
 } from "react-icons/fa";
 import logo from "../assets/hero.png";
 import { useLocation } from "react-router-dom";
+import EditProfileModal from "./EditProfilModel";
 
-function Navbar() {
+function Navbar({ role, onLogout }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [safetyOpen, setSafetyOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const location = useLocation();
 
   const services = [
@@ -44,13 +47,13 @@ function Navbar() {
             <NavLink to="/" className="flex items-center gap-3">
               <img
                 src={logo}
-                alt="VoltEdge Energy"
+                alt="ALDC Energy"
                 className="w-12 h-12 sm:w-14 sm:h-14 object-contain"
               />
 
               <div>
                 <h1 className="text-lg sm:text-2xl font-bold text-blue-900">
-                  VoltEdge Energy
+                  ALDC Energy
                 </h1>
                 <p className="text-[10px] sm:text-xs text-gray-500">
                   Powering The Future
@@ -105,20 +108,23 @@ function Navbar() {
                 </div>
               </li>
 
-              {/* Safety Dropdown */}
-              <li className="relative group">
-                <NavLink
-                  to="/services"
-                  className={`pb-1 transition ${
-                    location.pathname.startsWith("/services")
-                      ? "text-blue-700 border-b-2 border-yellow-400"
-                      : "text-gray-700 hover:text-blue-700"
-                  }`}
-                >
-                  Services
-                </NavLink>
 
-                {/* Dropdown */}
+              <li className="relative group">
+                <button className="flex items-center gap-1 text-gray-700 hover:text-blue-700 transition">
+                  Safety <FaChevronDown className="text-xs" />
+                </button>
+
+                <div className="absolute left-0 mt-3 w-64 bg-white rounded-lg shadow-xl border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                  {safety.map((item) => (
+                    <a
+                      key={item}
+                      href="#"
+                      className="block px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 border-b last:border-b-0"
+                    >
+                      {item}
+                    </a>
+                  ))}
+                </div>
               </li>
 
               <li>
@@ -180,10 +186,29 @@ function Navbar() {
                 <FaSearch />
               </button>
 
-              <button className="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-md flex items-center gap-2 transition">
-                <FaUserCircle />
-                Login
-              </button>
+              {role ? (
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setProfileOpen(true)}
+                    className="flex items-center gap-2 text-gray-700 hover:text-blue-700 transition"
+                  >
+                    <FaUserCircle className="text-blue-700" />
+                    <span className="capitalize">{role}</span>
+                  </button>
+                  <button
+                    onClick={onLogout}
+                    className="border border-blue-700 text-blue-700 hover:bg-blue-700 hover:text-white px-4 py-2 rounded-md flex items-center gap-2 transition"
+                  >
+                    <FaSignOutAlt />
+                    Log out
+                  </button>
+                </div>
+              ) : (
+                <button className="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-md flex items-center gap-2 transition">
+                  <FaUserCircle />
+                  Login
+                </button>
+              )}
             </div>
 
             {/* Hamburger */}
@@ -224,6 +249,19 @@ function Navbar() {
         </div>
 
         <div className="overflow-y-auto h-[calc(100%-160px)]">
+          {role && (
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                setProfileOpen(true);
+              }}
+              className="w-full flex items-center gap-2 px-6 py-4 border-b bg-blue-50 text-blue-800 font-semibold hover:bg-blue-100 transition"
+            >
+              <FaUserCircle />
+              <span className="capitalize">{role} signed in</span>
+            </button>
+          )}
+
           <NavLink
             to="/"
             onClick={() => setMenuOpen(false)}
@@ -326,12 +364,31 @@ function Navbar() {
             Search
           </button>
 
-          <button className="w-full flex items-center justify-center gap-2 h-11 rounded-md bg-blue-700 hover:bg-blue-800 text-white transition">
-            <FaUserCircle />
-            Login
-          </button>
+          {role ? (
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                onLogout();
+              }}
+              className="w-full flex items-center justify-center gap-2 h-11 rounded-md border border-blue-700 text-blue-700 hover:bg-blue-700 hover:text-white transition"
+            >
+              <FaSignOutAlt />
+              Log out
+            </button>
+          ) : (
+            <button className="w-full flex items-center justify-center gap-2 h-11 rounded-md bg-blue-700 hover:bg-blue-800 text-white transition">
+              <FaUserCircle />
+              Login
+            </button>
+          )}
         </div>
       </div>
+
+      <EditProfileModal
+        isOpen={profileOpen}
+        onClose={() => setProfileOpen(false)}
+        role={role}
+      />
     </>
   );
 }
