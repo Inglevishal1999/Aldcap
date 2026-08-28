@@ -1,4 +1,4 @@
-import BlogSection from "./BlogSection";
+import BlogSection from "../Components/BlogSection";
 import blogHeroImg from "../assets/bloghome.jpeg";
 
 function Blog() {

@@ -25,7 +25,7 @@ export default function CardShell({
           </h3>
         </div>
         <a
-          href="#"
+          href="/news"
           className="group flex items-center gap-1 text-xs font-semibold tracking-wide text-blue-700 hover:text-amber-500"
         >
           {viewAllLabel}

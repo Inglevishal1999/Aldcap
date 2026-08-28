@@ -1,7 +1,6 @@
-import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import {
-  FaSearch,
   FaUserCircle,
   FaBars,
   FaTimes,
@@ -10,24 +9,14 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 import logo from "../assets/hero.png";
-import { useLocation } from "react-router-dom";
 import EditProfileModal from "./EditProfilModel";
 
 function Navbar({ role, onLogout }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [servicesOpen, setServicesOpen] = useState(false);
   const [safetyOpen, setSafetyOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-
-  const services = [
-    "Electrical Installation",
-    "Power Distribution",
-    "Solar Solutions",
-    "Industrial Automation",
-    "Maintenance",
-    "Emergency Support",
-  ];
 
   const safety = [
     "Safety Guidelines",
@@ -37,89 +26,84 @@ function Navbar({ role, onLogout }) {
     "Safety Documents",
   ];
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
+
+  // Subtle shadow/blur intensifies on scroll
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const navLinkClass = ({ isActive }) =>
+    `relative px-1 py-1 text-[15px] font-semibold tracking-tight transition-colors ${
+      isActive
+        ? "text-blue-900"
+        : "text-slate-600 hover:text-blue-900"
+    } after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:bg-yellow-400 after:transition-all after:duration-300 ${
+      isActive ? "after:w-full" : "after:w-0 hover:after:w-full"
+    }`;
+
   return (
     <>
       {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
+      <nav
+        className={`sticky top-0 z-50 border-b transition-all duration-300 ${
+          scrolled
+            ? "border-slate-200 bg-white/90 shadow-sm backdrop-blur-md"
+            : "border-transparent bg-white"
+        }`}
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-20 items-center justify-between">
             {/* Logo */}
             <NavLink to="/" className="flex items-center gap-3">
               <img
                 src={logo}
                 alt="ALDC Energy"
-                className="w-12 h-12 sm:w-14 sm:h-14 object-contain"
+                className="h-12 w-12 object-contain sm:h-14 sm:w-14"
               />
 
               <div>
-                <h1 className="text-lg sm:text-2xl font-bold text-blue-900">
-                  ALDC Energy
+                <h1 className="text-lg font-extrabold leading-tight text-blue-950 sm:text-2xl">
+                  ALDC <span className="text-blue-700">Energy</span>
                 </h1>
-                <p className="text-[10px] sm:text-xs text-gray-500">
+                <p className="text-[10px] font-medium uppercase tracking-[0.15em] text-gray-400 sm:text-xs">
                   Powering The Future
                 </p>
               </div>
             </NavLink>
 
             {/* Desktop Menu */}
-            <ul className="hidden lg:flex items-center gap-8 font-semibold">
+            <ul className="hidden items-center gap-9 lg:flex">
               <li>
-                <NavLink
-                  to="/"
-                  className={({ isActive }) =>
-                    isActive
-                      ? "text-blue-700 border-b-2 border-yellow-400 pb-1"
-                      : "text-gray-700 hover:text-blue-700 transition"
-                  }
-                >
+                <NavLink to="/" className={navLinkClass}>
                   Home
                 </NavLink>
               </li>
 
               <li>
-                <NavLink
-                  to="/about"
-                  className={({ isActive }) =>
-                    isActive
-                      ? "text-blue-700 border-b-2 border-yellow-400 pb-1"
-                      : "text-gray-700 hover:text-blue-700 transition"
-                  }
-                >
+                <NavLink to="/about" className={navLinkClass}>
                   About Us
                 </NavLink>
               </li>
 
-              {/* Services Dropdown */}
-              <li className="relative group">
-                <button className="flex items-center gap-1 text-gray-700 hover:text-blue-700 transition">
-                  Services <FaChevronDown className="text-xs" />
+              {/* Safety Dropdown */}
+              <li className="group relative">
+                <button className="flex items-center gap-1.5 text-[15px] font-semibold text-slate-600 transition-colors hover:text-blue-900">
+                  Safety
+                  <FaChevronDown className="text-[10px] transition-transform duration-200 group-hover:rotate-180" />
                 </button>
 
-                <div className="absolute left-0 mt-3 w-64 bg-white rounded-lg shadow-xl border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                  {services.map((item) => (
-                    <a
-                      key={item}
-                      href="#"
-                      className="block px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 border-b last:border-b-0"
-                    >
-                      {item}
-                    </a>
-                  ))}
-                </div>
-              </li>
-
-
-              <li className="relative group">
-                <button className="flex items-center gap-1 text-gray-700 hover:text-blue-700 transition">
-                  Safety <FaChevronDown className="text-xs" />
-                </button>
-
-                <div className="absolute left-0 mt-3 w-64 bg-white rounded-lg shadow-xl border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                <div className="invisible absolute left-0 mt-4 w-64 origin-top scale-95 rounded-xl border border-slate-100 bg-white opacity-0 shadow-xl transition-all duration-200 group-hover:visible group-hover:scale-100 group-hover:opacity-100">
                   {safety.map((item) => (
                     <a
                       key={item}
                       href="#"
-                      className="block px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 border-b last:border-b-0"
+                      className="block border-b border-slate-50 px-5 py-3 text-sm text-slate-600 transition-colors first:rounded-t-xl last:rounded-b-xl last:border-b-0 hover:bg-blue-50 hover:text-blue-900"
                     >
                       {item}
                     </a>
@@ -128,93 +112,70 @@ function Navbar({ role, onLogout }) {
               </li>
 
               <li>
-                <NavLink
-                  to="/gallery"
-                  className={({ isActive }) =>
-                    isActive
-                      ? "text-blue-700 border-b-2 border-yellow-400 pb-1"
-                      : "text-gray-700 hover:text-blue-700 transition"
-                  }
-                >
+                <NavLink to="/gallery" className={navLinkClass}>
                   Gallery
                 </NavLink>
               </li>
 
               <li>
-                <NavLink
-                  to="/blog"
-                  className={({ isActive }) =>
-                    isActive
-                      ? "text-blue-700 border-b-2 border-yellow-400 pb-1"
-                      : "text-gray-700 hover:text-blue-700 transition"
-                  }
-                >
+                <NavLink to="/blog" className={navLinkClass}>
                   Blog
                 </NavLink>
               </li>
 
               <li>
-                <NavLink
-                  to="/news"
-                  className={({ isActive }) =>
-                    isActive
-                      ? "text-blue-700 border-b-2 border-yellow-400 pb-1"
-                      : "text-gray-700 hover:text-blue-700 transition"
-                  }
-                >
+                <NavLink to="/news" className={navLinkClass}>
                   News
                 </NavLink>
               </li>
 
               <li>
-                <NavLink
-                  to="/contact"
-                  className={({ isActive }) =>
-                    isActive
-                      ? "text-blue-700 border-b-2 border-yellow-400 pb-1"
-                      : "text-gray-700 hover:text-blue-700 transition"
-                  }
-                >
+                <NavLink to="/contact" className={navLinkClass}>
                   Contact
                 </NavLink>
               </li>
             </ul>
 
             {/* Desktop Right */}
-            <div className="hidden lg:flex items-center gap-4">
-              <button className="w-10 h-10 rounded-full bg-gray-100 hover:bg-blue-700 hover:text-white transition flex items-center justify-center">
-                <FaSearch />
-              </button>
-
+            <div className="hidden items-center gap-4 lg:flex">
               {role ? (
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setProfileOpen(true)}
-                    className="flex items-center gap-2 text-gray-700 hover:text-blue-700 transition"
+                    className="flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-4 text-slate-600 transition hover:bg-slate-50 hover:text-blue-900"
                   >
-                    <FaUserCircle className="text-blue-700" />
-                    <span className="capitalize">{role}</span>
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-950 text-white">
+                      <FaUserCircle className="text-lg" />
+                    </span>
+                    <span className="text-sm font-semibold capitalize">
+                      {role}
+                    </span>
                   </button>
+
                   <button
                     onClick={onLogout}
-                    className="border border-blue-700 text-blue-700 hover:bg-blue-700 hover:text-white px-4 py-2 rounded-md flex items-center gap-2 transition"
+                    className="flex items-center gap-2 rounded-full border border-blue-900 px-4 py-2.5 text-sm font-semibold text-blue-900 transition hover:bg-blue-900 hover:text-white"
                   >
                     <FaSignOutAlt />
                     Log out
                   </button>
                 </div>
               ) : (
-                <button className="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2 rounded-md flex items-center gap-2 transition">
+                <NavLink
+                  to="/login"
+                  className="flex items-center gap-2 rounded-full bg-blue-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-900/20 transition hover:bg-blue-800 hover:shadow-md"
+                >
                   <FaUserCircle />
                   Login
-                </button>
+                </NavLink>
               )}
             </div>
 
             {/* Hamburger */}
             <button
               onClick={() => setMenuOpen(true)}
-              className="lg:hidden text-2xl text-blue-800"
+              className="text-2xl text-blue-900 lg:hidden"
+              aria-label="Open menu"
             >
               <FaBars />
             </button>
@@ -225,37 +186,38 @@ function Navbar({ role, onLogout }) {
       {/* Overlay */}
       <div
         onClick={() => setMenuOpen(false)}
-        className={`fixed inset-0 bg-black/40 z-40 transition-opacity duration-300 lg:hidden ${
-          menuOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        className={`fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${
+          menuOpen ? "visible opacity-100" : "invisible opacity-0"
         }`}
       />
 
       {/* Mobile Drawer */}
       <div
-        className={`fixed top-0 right-0 h-screen w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 lg:hidden ${
+        className={`fixed right-0 top-0 z-50 h-screen w-80 max-w-[85vw] transform bg-white shadow-2xl transition-transform duration-300 lg:hidden ${
           menuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Drawer Header */}
-        <div className="flex items-center justify-between h-20 px-5 border-b">
-          <h2 className="text-xl font-bold text-blue-800">Menu</h2>
+        <div className="flex h-20 items-center justify-between border-b border-slate-100 px-5">
+          <h2 className="text-xl font-bold text-blue-950">Menu</h2>
 
           <button
             onClick={() => setMenuOpen(false)}
-            className="text-2xl text-blue-800"
+            className="text-2xl text-blue-900"
+            aria-label="Close menu"
           >
             <FaTimes />
           </button>
         </div>
 
-        <div className="overflow-y-auto h-[calc(100%-160px)]">
+        <div className="h-[calc(100%-160px)] overflow-y-auto">
           {role && (
             <button
               onClick={() => {
                 setMenuOpen(false);
                 setProfileOpen(true);
               }}
-              className="w-full flex items-center gap-2 px-6 py-4 border-b bg-blue-50 text-blue-800 font-semibold hover:bg-blue-100 transition"
+              className="flex w-full items-center gap-3 border-b border-slate-100 bg-blue-50 px-6 py-4 font-semibold text-blue-900 transition hover:bg-blue-100"
             >
               <FaUserCircle />
               <span className="capitalize">{role} signed in</span>
@@ -264,59 +226,34 @@ function Navbar({ role, onLogout }) {
 
           <NavLink
             to="/"
-            onClick={() => setMenuOpen(false)}
-            className="block px-6 py-4 border-b hover:bg-blue-50"
+            className="block border-b border-slate-100 px-6 py-4 text-slate-700 hover:bg-blue-50"
           >
             Home
           </NavLink>
 
           <NavLink
             to="/about"
-            onClick={() => setMenuOpen(false)}
-            className="block px-6 py-4 border-b hover:bg-blue-50"
+            className="block border-b border-slate-100 px-6 py-4 text-slate-700 hover:bg-blue-50"
           >
             About Us
           </NavLink>
 
-          {/* Mobile Services */}
-          <button
-            onClick={() => setServicesOpen(!servicesOpen)}
-            className="w-full flex items-center justify-between px-6 py-4 border-b hover:bg-blue-50"
-          >
-            <span>Services</span>
-            {servicesOpen ? <FaChevronUp /> : <FaChevronDown />}
-          </button>
-
-          {servicesOpen && (
-            <div className="bg-gray-50">
-              {services.map((item) => (
-                <a
-                  key={item}
-                  href="#"
-                  className="block px-10 py-3 text-sm text-gray-700 hover:bg-blue-100"
-                >
-                  {item}
-                </a>
-              ))}
-            </div>
-          )}
-
           {/* Mobile Safety */}
           <button
             onClick={() => setSafetyOpen(!safetyOpen)}
-            className="w-full flex items-center justify-between px-6 py-4 border-b hover:bg-blue-50"
+            className="flex w-full items-center justify-between border-b border-slate-100 px-6 py-4 text-slate-700 hover:bg-blue-50"
           >
             <span>Safety</span>
             {safetyOpen ? <FaChevronUp /> : <FaChevronDown />}
           </button>
 
           {safetyOpen && (
-            <div className="bg-gray-50">
+            <div className="bg-slate-50">
               {safety.map((item) => (
                 <a
                   key={item}
                   href="#"
-                  className="block px-10 py-3 text-sm text-gray-700 hover:bg-blue-100"
+                  className="block px-10 py-3 text-sm text-slate-600 hover:bg-blue-100"
                 >
                   {item}
                 </a>
@@ -326,60 +263,55 @@ function Navbar({ role, onLogout }) {
 
           <NavLink
             to="/gallery"
-            onClick={() => setMenuOpen(false)}
-            className="block px-6 py-4 border-b hover:bg-blue-50"
+            className="block border-b border-slate-100 px-6 py-4 text-slate-700 hover:bg-blue-50"
           >
             Gallery
           </NavLink>
 
           <NavLink
             to="/blog"
-            onClick={() => setMenuOpen(false)}
-            className="block px-6 py-4 border-b hover:bg-blue-50"
+            className="block border-b border-slate-100 px-6 py-4 text-slate-700 hover:bg-blue-50"
           >
             Blog
           </NavLink>
 
           <NavLink
             to="/news"
-            onClick={() => setMenuOpen(false)}
-            className="block px-6 py-4 border-b hover:bg-blue-50"
+            className="block border-b border-slate-100 px-6 py-4 text-slate-700 hover:bg-blue-50"
           >
             News
           </NavLink>
 
           <NavLink
             to="/contact"
-            onClick={() => setMenuOpen(false)}
-            className="block px-6 py-4 border-b hover:bg-blue-50"
+            className="block border-b border-slate-100 px-6 py-4 text-slate-700 hover:bg-blue-50"
           >
             Contact
           </NavLink>
         </div>
 
         {/* Bottom Buttons */}
-        <div className="absolute bottom-5 left-0 right-0 px-5 space-y-3">
-          <button className="w-full flex items-center justify-center gap-2 h-11 rounded-md bg-gray-100 hover:bg-blue-700 hover:text-white transition">
-            <FaSearch />
-            Search
-          </button>
-
+        <div className="absolute bottom-5 left-0 right-0 px-5">
           {role ? (
             <button
               onClick={() => {
                 setMenuOpen(false);
                 onLogout();
               }}
-              className="w-full flex items-center justify-center gap-2 h-11 rounded-md border border-blue-700 text-blue-700 hover:bg-blue-700 hover:text-white transition"
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-full border border-blue-900 text-blue-900 transition hover:bg-blue-900 hover:text-white"
             >
               <FaSignOutAlt />
               Log out
             </button>
           ) : (
-            <button className="w-full flex items-center justify-center gap-2 h-11 rounded-md bg-blue-700 hover:bg-blue-800 text-white transition">
+            <NavLink
+              to="/login"
+              onClick={() => setMenuOpen(false)}
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-blue-900 text-white shadow-sm shadow-blue-900/20 transition hover:bg-blue-800"
+            >
               <FaUserCircle />
               Login
-            </button>
+            </NavLink>
           )}
         </div>
       </div>

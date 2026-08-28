@@ -38,9 +38,9 @@ function ImageGallery() {
         </div>
 
         <div className="mt-auto pt-5 text-center">
-          <button className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-md transition">
+          <a href="/gallery" className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-md transition">
             See More Gallery →
-          </button>
+          </a>
         </div>
       </div>
     </div>

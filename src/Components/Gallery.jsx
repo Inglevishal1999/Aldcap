@@ -1,296 +1,358 @@
-import React, { useState } from "react";
-import { Zap, Building2, Sun, Wrench, Factory, PlayCircle, ArrowRight, Upload, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 
-const categories = ["All", "Projects", "Substations", "Solar", "Maintenance"];
+const PAGE_SIZE = 9;
 
-const categoryMeta = {
-  Projects: { icon: Zap, text: "text-amber-600" },
-  Substations: { icon: Building2, text: "text-blue-700" },
-  Solar: { icon: Sun, text: "text-teal-600" },
-  Maintenance: { icon: Wrench, text: "text-blue-700" },
-};
+// No Vite proxy is configured in vite.config.js, so this MUST point directly
+// at your Express server's full URL — check your backend's .env for PORT.
+const API_ORIGIN = "http://localhost:5000";
+const API_BASE = `${API_ORIGIN}/api/gallery`;
 
-const galleryItems = [
-  { id: 1, title: "345kV Transmission Upgrade", category: "Projects", location: "Salem, OR" },
-  { id: 2, title: "Substation Rebuild \u2014 Unit 4", category: "Substations", location: "Eugene, OR" },
-  { id: 3, title: "12MW Rooftop Solar Array", category: "Solar", location: "Bend, OR" },
-  { id: 4, title: "Quarterly Switchgear Service", category: "Maintenance", location: "Portland, OR" },
-  { id: 5, title: "Distribution Line Rebuild", category: "Projects", location: "Salem, OR" },
-  { id: 6, title: "138kV Substation Expansion", category: "Substations", location: "Medford, OR" },
-  { id: 7, title: "Community Solar Farm", category: "Solar", location: "Redmond, OR" },
-  { id: 8, title: "Transformer Inspection Program", category: "Maintenance", location: "Portland, OR" },
-  { id: 9, title: "Underground Feeder Install", category: "Projects", location: "Salem, OR" },
-  { id: 10, title: "Relay Protection Upgrade", category: "Substations", location: "Eugene, OR" },
-  { id: 11, title: "Ground-Mount Solar \u2014 Phase II", category: "Solar", location: "Bend, OR" },
-  { id: 12, title: "Preventive Maintenance Sweep", category: "Maintenance", location: "Salem, OR" },
+// Images come back from the API as relative paths like "/uploads/gallery/xyz.jpg".
+// Prefix with API_ORIGIN so they resolve correctly if frontend/backend are on
+// different ports.
+function resolveImage(path) {
+  if (!path) return "";
+  if (path.startsWith("http")) return path;
+  return `${API_ORIGIN}${path}`;
+}
+
+const STATS = [
+  { label: "Active Projects", value: "42" },
+  { label: "Grid Capacity", value: "1.2GW" },
+  { label: "Years Powering Nagpur", value: "18" },
+  { label: "Communities Served", value: "6" },
 ];
 
-const highlights = [
-  { icon: Zap, label: "Transmission Line" },
-  { icon: Sun, label: "Solar Installation" },
-  { icon: Factory, label: "Industrial Electrical Systems" },
-];
+export default function Gallery() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [page, setPage] = useState(1);
+  const [activeIndex, setActiveIndex] = useState(null);
 
-const videos = [
-  { title: "Project Walkthrough", duration: "4:12" },
-  { title: "Installation Process", duration: "6:40" },
-  { title: "Safety Training", duration: "3:05" },
-];
+  useEffect(() => {
+    let cancelled = false;
 
-export default function GalleryPage() {
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [visibleCount, setVisibleCount] = useState(8);
-  const [uploadedImages, setUploadedImages] = useState([]);
-  const [uploadCategory, setUploadCategory] = useState("Projects");
+    async function fetchItems() {
+      setLoading(true);
+      setError("");
+      try {
+        const res = await fetch(API_BASE);
+        if (!res.ok) throw new Error("Failed to load gallery");
+        const json = await res.json();
+        if (!cancelled) setItems(json.data ?? []);
+      } catch (err) {
+        if (!cancelled) setError(err.message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
 
-  const allItems = [...uploadedImages, ...galleryItems];
+    fetchItems();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-  const filteredItems =
-    activeCategory === "All"
-      ? allItems
-      : allItems.filter((item) => item.category === activeCategory);
+  const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+  const pageItems = useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE;
+    return items.slice(start, start + PAGE_SIZE);
+  }, [items, page]);
 
-  const visibleItems = filteredItems.slice(0, visibleCount);
-  const hasMore = visibleCount < filteredItems.length;
+  const active = activeIndex !== null ? items[activeIndex] : null;
 
-  const handleCategoryChange = (cat) => {
-    setActiveCategory(cat);
-    setVisibleCount(8);
-  };
-
-  const handleFileUpload = (e) => {
-    const files = Array.from(e.target.files || []);
-    const newImages = files.map((file, idx) => ({
-      id: `upload-${Date.now()}-${idx}`,
-      title: file.name.replace(/\.[^/.]+$/, ""),
-      category: uploadCategory,
-      url: URL.createObjectURL(file),
-      isUpload: true,
-    }));
-    setUploadedImages((prev) => [...newImages, ...prev]);
-    setVisibleCount((c) => Math.max(c, 8));
-    e.target.value = "";
-  };
-
-  const removeUpload = (id) => {
-    setUploadedImages((prev) => {
-      const target = prev.find((img) => img.id === id);
-      if (target) URL.revokeObjectURL(target.url);
-      return prev.filter((img) => img.id !== id);
-    });
-  };
+  function openAt(globalIndex) {
+    setActiveIndex(globalIndex);
+  }
+  function close() {
+    setActiveIndex(null);
+  }
+  function showPrev() {
+    setActiveIndex((i) => (i - 1 + items.length) % items.length);
+  }
+  function showNext() {
+    setActiveIndex((i) => (i + 1) % items.length);
+  }
 
   return (
-    <div className="bg-white text-gray-800 font-sans">
+    <div className="bg-[#EEF1F6]">
+      {/* ---------------- HERO ---------------- */}
+      <section className="relative overflow-hidden bg-[#0F2A52] px-6 pb-0 pt-24 text-white">
+        {/* faint grid backdrop, echoes a transmission grid */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.14]"
+          style={{
+            backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23F2A93B' stroke-width='1.5'%3E%3Cpath d='M0 20h30v20h20v40h30M60 0v40h60M0 80h50v40M90 40v80'/%3E%3C/g%3E%3Cg fill='%23F2A93B'%3E%3Ccircle cx='30' cy='40' r='2.5'/%3E%3Ccircle cx='50' cy='80' r='2.5'/%3E%3Ccircle cx='90' cy='40' r='2.5'/%3E%3Ccircle cx='60' cy='40' r='2.5'/%3E%3Ccircle cx='0' cy='80' r='2.5'/%3E%3C/g%3E%3C/svg%3E\")",
+            backgroundSize: "120px 120px",
+          }}
+        />
+        {/* warm glow, gold not teal, to stay on-brand with the amber underline used on the live nav tab */}
+        <div
+          className="pointer-events-none absolute -right-40 -top-40 h-[560px] w-[560px] rounded-full opacity-20 blur-3xl"
+          style={{ background: "radial-gradient(circle, #F2A93B 0%, transparent 70%)" }}
+        />
 
-      {/* GALLERY HERO */}
-      <header className="bg-gray-50 border-b border-gray-200 py-20">
-        <div className="max-w-5xl mx-auto px-8">
-          <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-amber-600 mb-4">
-            <span className="w-4 h-px bg-amber-500 inline-block" />
-            Our Project Gallery
-          </div>
-          <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight leading-none max-w-2xl text-blue-900">
-            Explore Our Work &amp; Electrical Excellence
+        <div className="relative mx-auto max-w-6xl">
+          <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-[#F2A93B]">
+            <Link to="/" className="hover:text-white">
+              Home
+            </Link>
+            <span className="text-white/30">/</span>
+            <span className="text-white/60">Gallery</span>
+          </p>
+
+          <h1 className="mt-5 flex items-start gap-2 text-[13vw] font-extrabold uppercase leading-[0.88] tracking-tight sm:text-6xl md:text-7xl">
+            <BoltIcon className="mt-2 h-8 w-8 shrink-0 text-[#F2A93B] sm:h-12 sm:w-12" />
+            <span>
+              Powering the <span className="text-[#F2A93B]">Future</span>,<br className="hidden sm:block" /> in Pictures
+            </span>
           </h1>
+
+          <p className="mt-6 max-w-lg text-base text-white/65 md:text-lg">
+            Substations at sunrise, crews on the line, and every milestone in
+            between &mdash; a look at how ALDC Energy keeps Nagpur and the
+            surrounding region charged and running.
+          </p>
         </div>
-      </header>
 
-      {/* CATEGORY FILTER */}
-      <nav className="sticky top-0 z-10 bg-white/95 border-b border-gray-200">
-        <div className="max-w-5xl mx-auto px-8">
-          <div className="flex items-center gap-3 overflow-x-auto whitespace-nowrap py-5">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => handleCategoryChange(cat)}
-                className={`font-mono text-xs uppercase tracking-widest px-4 py-2 border transition-colors ${
-                  activeCategory === cat
-                    ? "bg-blue-800 text-white border-blue-800"
-                    : "border-gray-300 text-gray-600 hover:border-blue-800 hover:text-blue-800"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
-      </nav>
-
-      <main>
-
-        {/* FEATURED PROJECT */}
-        <section className="py-20 border-b border-gray-200">
-          <div className="max-w-5xl mx-auto px-8">
-            <div className="font-mono text-xs uppercase tracking-widest text-amber-600 mb-6">Featured Project</div>
-            <div className="relative bg-gradient-to-br from-blue-800 to-blue-900 border border-blue-900 aspect-[21/9] flex items-end p-8 overflow-hidden">
-              <Zap className="absolute right-8 top-8 w-16 h-16 text-blue-700" strokeWidth={1} />
-              <div>
-                <div className="font-mono text-xs uppercase tracking-widest text-amber-300 mb-2">Completed 2025 &middot; Salem, OR</div>
-                <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tight text-white">
-                  Power Distribution Project 2025
-                </h2>
-                <div className="flex gap-8 mt-6 font-mono text-xs text-blue-200">
-                  <div>CAPACITY<span className="block text-white text-base mt-1">345kV</span></div>
-                  <div>DURATION<span className="block text-white text-base mt-1">8 months</span></div>
-                  <div>CIRCUIT MILES<span className="block text-white text-base mt-1">62</span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* PHOTO GALLERY */}
-        <section className="py-20 border-b border-gray-200">
-          <div className="max-w-5xl mx-auto px-8">
-            <div className="font-mono text-xs uppercase tracking-widest text-amber-600 mb-2">Photo Gallery</div>
-            <h2 className="text-2xl font-black uppercase tracking-tight mb-8 text-blue-900">
-              {activeCategory === "All" ? "All Projects" : activeCategory}
-            </h2>
-
-            {/* UPLOAD */}
-            <div className="mb-10 border border-dashed border-blue-300 bg-gray-50 p-6 flex flex-col sm:flex-row sm:items-center gap-4">
-              <div className="flex items-center gap-3">
-                <Upload className="w-6 h-6 text-amber-500 flex-shrink-0" strokeWidth={1.5} />
-                <div>
-                  <div className="text-sm text-gray-800">Upload project photos</div>
-                  <div className="text-xs text-gray-500 mt-0.5">JPG or PNG, multiple files allowed &middot; this session only</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 sm:ml-auto">
-                <select
-                  value={uploadCategory}
-                  onChange={(e) => setUploadCategory(e.target.value)}
-                  className="bg-white border border-gray-300 text-xs font-mono uppercase tracking-widest px-3 py-2.5 text-gray-700"
-                >
-                  {categories.filter((c) => c !== "All").map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-                <label className="cursor-pointer font-mono text-xs uppercase tracking-widest px-4 py-2.5 bg-amber-400 text-blue-900 hover:bg-amber-300 transition-colors">
-                  Choose Files
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-            </div>
-
-            {visibleItems.length === 0 ? (
-              <p className="text-gray-500 text-sm">No projects in this category yet.</p>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                {visibleItems.map((item) => {
-                  const meta = categoryMeta[item.category];
-                  const Icon = meta.icon;
-                  return (
-                    <div
-                      key={item.id}
-                      className="group relative aspect-square bg-gray-100 border border-gray-200 overflow-hidden flex items-center justify-center"
-                    >
-                      {item.isUpload ? (
-                        <img
-                          src={item.url}
-                          alt={item.title}
-                          className="absolute inset-0 w-full h-full object-cover"
-                        />
-                      ) : (
-                        <Icon className="w-8 h-8 text-gray-300 group-hover:text-gray-400 transition-colors" strokeWidth={1.5} />
-                      )}
-
-                      {item.isUpload && (
-                        <button
-                          onClick={() => removeUpload(item.id)}
-                          className="absolute top-2 right-2 bg-blue-900/80 text-white hover:text-amber-300 p-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                          aria-label={`Remove ${item.title}`}
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      )}
-
-                      <div className="absolute inset-x-0 bottom-0 bg-blue-900/90 p-3">
-                        <div className="font-mono text-[10px] uppercase tracking-widest text-amber-300">{item.category}</div>
-                        <div className="text-xs text-white mt-1 leading-tight truncate">{item.title}</div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* PROJECT HIGHLIGHTS */}
-        <section className="py-20 border-b border-gray-200">
-          <div className="max-w-5xl mx-auto px-8">
-            <div className="font-mono text-xs uppercase tracking-widest text-amber-600 mb-10">Project Highlights</div>
-            <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-gray-200 border border-gray-200">
-              {highlights.map((h) => (
-                <div key={h.label} className="p-8 flex flex-col items-start gap-4">
-                  <h.icon className="w-7 h-7 text-amber-500" strokeWidth={1.5} />
-                  <span className="font-mono text-sm uppercase tracking-widest text-blue-900">{h.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* VIDEO GALLERY */}
-        <section className="py-20 border-b border-gray-200">
-          <div className="max-w-5xl mx-auto px-8">
-            <div className="font-mono text-xs uppercase tracking-widest text-amber-600 mb-10">Video Gallery</div>
-            <div className="grid sm:grid-cols-3 gap-4">
-              {videos.map((v) => (
-                <button
-                  key={v.title}
-                  className="group relative aspect-video bg-gray-100 border border-gray-200 flex items-center justify-center overflow-hidden"
-                >
-                  <PlayCircle className="w-10 h-10 text-gray-400 group-hover:text-blue-800 transition-colors" strokeWidth={1.5} />
-                  <div className="absolute inset-x-0 bottom-0 bg-blue-900/90 p-3 flex items-center justify-between">
-                    <span className="text-xs text-white">{v.title}</span>
-                    <span className="font-mono text-[10px] text-blue-200">{v.duration}</span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* LOAD MORE */}
-        {hasMore && (
-          <section className="py-14 border-b border-gray-200">
-            <div className="max-w-5xl mx-auto px-8 flex justify-center">
-              <button
-                onClick={() => setVisibleCount((c) => c + 4)}
-                className="font-mono text-xs uppercase tracking-widest px-8 py-3 border border-gray-300 text-gray-600 hover:border-blue-800 hover:text-blue-800 transition-colors"
-              >
-                View More Photos
-              </button>
-            </div>
-          </section>
-        )}
-
-      </main>
-
-      {/* CONTACT CTA */}
-      <section className="bg-blue-800 text-white py-20">
-        <div className="max-w-5xl mx-auto px-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-          <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight max-w-md">
-            Ready to Work With Our Team?
-          </h2>
-          <a
-            href="#"
-            className="inline-flex items-center gap-2 font-mono text-sm uppercase tracking-widest px-8 py-4 bg-amber-400 text-blue-900 hover:bg-amber-300 transition-colors w-fit"
+        {/* live current line, signature element — power flowing through a transmission line */}
+        <div className="relative mt-14 h-16 w-full overflow-hidden">
+          <svg
+            viewBox="0 0 1200 80"
+            preserveAspectRatio="none"
+            className="h-full w-[200%] animate-[pulse-scroll_9s_linear_infinite]"
           >
-            Contact Us <ArrowRight className="w-4 h-4" />
-          </a>
+            <polyline
+              fill="none"
+              stroke="#F2A93B"
+              strokeWidth="2"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              points="0,40 60,40 90,10 120,70 150,40 260,40 290,20 320,60 350,40 500,40 540,5 570,75 600,40 800,40 830,15 860,65 890,40 1050,40 1080,25 1110,55 1140,40 1200,40 1260,40 1290,10 1320,70 1350,40 1460,40 1490,20 1520,60 1550,40 1700,40 1740,5 1770,75 1800,40 2000,40 2030,15 2060,65 2090,40 2200,40"
+              opacity="0.55"
+            />
+            {/* traveling current sparks */}
+            <circle r="4" fill="#F2A93B">
+              <animateMotion
+                dur="3s"
+                repeatCount="indefinite"
+                path="M0,40 60,40 90,10 120,70 150,40 260,40 290,20 320,60 350,40 500,40 540,5 570,75 600,40"
+              />
+            </circle>
+            <circle r="4" fill="#F2A93B">
+              <animateMotion
+                dur="3s"
+                begin="1.5s"
+                repeatCount="indefinite"
+                path="M600,40 800,40 830,15 860,65 890,40 1050,40 1080,25 1110,55 1140,40 1200,40"
+              />
+            </circle>
+          </svg>
+          <div className="absolute inset-x-0 bottom-0 h-px bg-white/10" />
+        </div>
+
+        {/* stat ticker strip */}
+        <div className="relative mx-auto grid max-w-6xl grid-cols-2 gap-px border-t border-white/10 bg-white/10 sm:grid-cols-4">
+          {STATS.map((s) => (
+            <div key={s.label} className="bg-[#0F2A52] px-6 py-6">
+              <p className="text-2xl font-bold text-white md:text-3xl">{s.value}</p>
+              <p className="mt-1 text-xs uppercase tracking-wide text-white/50">{s.label}</p>
+            </div>
+          ))}
         </div>
       </section>
 
+      {/* ---------------- GRID ---------------- */}
+      <section className="mx-auto max-w-6xl px-6 py-16">
+        <div className="mb-10 flex items-end justify-between">
+          <h2 className="text-2xl font-bold text-[#0F2A52]">Recent Uploads</h2>
+          <p className="text-sm text-[#0F2A52]/50">
+            Page {page} of {totalPages}
+          </p>
+        </div>
+
+        {loading && <p className="py-16 text-center text-[#0F2A52]/50">Loading gallery…</p>}
+        {!loading && error && (
+          <p className="rounded-lg bg-red-50 px-4 py-3 text-center text-sm text-red-700">{error}</p>
+        )}
+        {!loading && !error && items.length === 0 && (
+          <p className="py-16 text-center text-[#0F2A52]/50">No photos yet — check back soon.</p>
+        )}
+
+        {!loading && !error && items.length > 0 && (
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {pageItems.map((item, i) => {
+            const globalIndex = (page - 1) * PAGE_SIZE + i;
+            return (
+              <button
+                key={item._id ?? item.id}
+                type="button"
+                onClick={() => openAt(globalIndex)}
+                className="group relative aspect-[4/5] overflow-hidden rounded-xl bg-[#0F2A52] text-left shadow-md shadow-[#0F2A52]/10"
+              >
+                <img
+                  src={resolveImage(item.image)}
+                  alt={item.caption}
+                  loading="lazy"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                {/* glass caption overlay */}
+                <div className="absolute inset-x-0 bottom-0 translate-y-2 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-4 pt-12 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                  <p className="line-clamp-1 text-sm font-semibold text-white">{item.caption}</p>
+                  <p className="mt-1 flex items-center gap-1.5 text-xs text-white/60">
+                    {new Date(item.date).toLocaleDateString(undefined, {
+                      month: "short",
+                      day: "2-digit",
+                      year: "numeric",
+                    })}
+                  </p>
+                </div>
+                {/* corner tag, always visible */}
+                <span className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition-colors group-hover:bg-[#F2A93B] group-hover:text-[#0F2A52]">
+                  <BoltIcon className="h-4 w-4" />
+                </span>
+              </button>
+            );
+          })}
+        </div>
+        )}
+
+        {/* pagination */}
+        {totalPages > 1 && (
+          <div className="mt-12 flex items-center justify-center gap-1.5">
+            <button
+              type="button"
+              disabled={page === 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              aria-label="Previous page"
+              className="flex h-9 w-9 items-center justify-center rounded-full text-[#0F2A52] transition-colors hover:bg-[#0F2A52]/5 disabled:opacity-30 disabled:hover:bg-transparent"
+            >
+              ‹
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setPage(n)}
+                className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium transition-colors ${
+                  n === page ? "bg-[#F2A93B] text-[#0F2A52]" : "text-[#0F2A52] hover:bg-[#0F2A52]/5"
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+            <button
+              type="button"
+              disabled={page === totalPages}
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              aria-label="Next page"
+              className="flex h-9 w-9 items-center justify-center rounded-full text-[#0F2A52] transition-colors hover:bg-[#0F2A52]/5 disabled:opacity-30 disabled:hover:bg-transparent"
+            >
+              ›
+            </button>
+          </div>
+        )}
+
+        {/* closing CTA */}
+        <div className="mt-16 flex flex-col items-start justify-between gap-6 rounded-2xl bg-[#0F2A52] p-8 text-white sm:flex-row sm:items-center">
+          <div className="flex items-center gap-4">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/5 text-[#F2A93B]">
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.75">
+                <path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L17 6h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" strokeLinejoin="round" />
+                <circle cx="12" cy="13" r="3.5" />
+              </svg>
+            </span>
+            <div>
+              <p className="text-lg font-semibold">Have an event or moment to share?</p>
+              <p className="mt-0.5 text-sm text-white/60">Send it our way and be part of the ALDC story.</p>
+            </div>
+          </div>
+          <Link
+            to="/contact"
+            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#F2A93B] px-5 py-2.5 text-sm font-semibold text-[#0F2A52] transition-colors hover:brightness-95"
+          >
+            Submit your photos
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </Link>
+        </div>
+      </section>
+
+      {/* ---------------- LIGHTBOX ---------------- */}
+      {active && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+          role="dialog"
+          aria-modal="true"
+        >
+          <button
+            type="button"
+            onClick={close}
+            aria-label="Close"
+            className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+          >
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.75">
+              <path strokeLinecap="round" d="M6 6l12 12M18 6 6 18" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={showPrev}
+            aria-label="Previous image"
+            className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 md:left-6"
+          >
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.75">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 6l-6 6 6 6" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={showNext}
+            aria-label="Next image"
+            className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 md:right-6"
+          >
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.75">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 6l6 6-6 6" />
+            </svg>
+          </button>
+
+          <div className="flex max-h-full w-full max-w-3xl flex-col items-center">
+            <p className="mb-3 self-end font-mono text-xs text-white/50">
+              {activeIndex + 1} / {items.length}
+            </p>
+            <img src={resolveImage(active.image)} alt={active.caption} className="max-h-[65vh] w-auto rounded-sm object-contain" />
+            <div className="mt-4 w-full">
+              <p className="text-xs text-white/50">
+                {new Date(active.date).toLocaleDateString(undefined, {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
+              <p className="mt-2 text-sm text-white/80">{active.caption}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* pulse-line scroll keyframes */}
+      <style>{`
+        @keyframes pulse-scroll {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+      `}</style>
     </div>
+  );
+}
+
+function BoltIcon({ className }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+      <path d="M13 2 3 14h6l-1 8 11-14h-6l1-6Z" />
+    </svg>
   );
 }

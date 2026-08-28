@@ -25,7 +25,7 @@ function Header() {
             <div className="flex items-center gap-2 min-w-0">
               <FaEnvelope className="text-yellow-400 text-xs shrink-0" />
               <span className="truncate">
-                info@aldcelectrical.com
+                info@aldcenergy.com
               </span>
             </div>
 
@@ -53,7 +53,7 @@ function Header() {
 
             <div className="flex items-center gap-2">
               <FaEnvelope className="text-yellow-400" />
-              <span>info@aldcelectrical.com</span>
+              <span>info@aldcenergy.com</span>
             </div>
 
             <div className="hidden lg:flex items-center gap-2">
