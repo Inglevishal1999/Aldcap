@@ -48,7 +48,7 @@ export default function EditProfileModal({ isOpen, onClose, role, onSave }) {
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 px-4"
+      className="fixed inset-0 z-60 flex items-center justify-center bg-black/40 px-4"
     >
       <div
         onClick={(e) => e.stopPropagation()}

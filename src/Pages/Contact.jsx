@@ -98,7 +98,7 @@ function ContactUs() {
                 </p>
                 <a
                   href="tel:18001234567"
-                  className="block text-xl sm:text-2xl font-bold text-slate-900 hover:text-yellow-600 transition-colors break-words"
+                  className="block text-xl sm:text-2xl font-bold text-slate-900 hover:text-yellow-600 transition-colors wrap-break-word"
                 >
                   1800 123 4567
                 </a>
@@ -204,15 +204,15 @@ function ContactUs() {
 
 function InfoRow({ icon, label, value }) {
   return (
-    <div className="px-4 sm:px-6 py-3 sm:py-4 flex gap-3">
-      <span className="text-yellow-500 mt-1 flex-shrink-0 text-sm sm:text-base">
+    <div className="max-w-7xl mx-auto lg:px-11 px-4 sm:px-6 py-3 sm:py-4 flex gap-3">
+      <span className="text-yellow-500 mt-1 shrink-0 text-sm sm:text-base">
         {icon}
       </span>
       <div className="min-w-0">
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
           {label}
         </p>
-        <p className="text-sm sm:text-base text-slate-900 mt-0.5 break-words">
+        <p className="text-sm sm:text-base text-slate-900 mt-0.5 wrap-break-word">
           {value}
         </p>
       </div>

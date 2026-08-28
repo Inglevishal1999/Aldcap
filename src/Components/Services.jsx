@@ -1,6 +1,6 @@
-import ImageGallery from "../Pages/ImageGallery";
-import LatestNews from "../Pages/LatestNews";
-import DutyRoster from "../Pages/DutyRoster";
+import ImageGallery from "../Components/ImageGallery";
+import LatestNews from "../Components/LatestNews";
+import DutyRoster from "../Components/DutyRoster";
 
 function InformationSection() {
   return (
