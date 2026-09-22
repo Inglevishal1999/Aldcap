@@ -1,13 +1,9 @@
 import axios from "axios";
 
-// ❌ REMOVE THE OLD LOCALHOST PATH:
-// const API = axios.create({
-//   baseURL: "http://localhost:5000/api",
-// });
-
-//  REPLACE IT WITH YOUR LIVE RENDER URL (Keep the "/api" at the end):
+// Unified configuration instance directing traffic to your live backend cloud database
 const API = axios.create({
   baseURL: "https://onrender.com",
+  withCredentials: true, // Crucial for parsing user cookies and login sessions safely
 });
 
 // Automatically attach JWT token to headers if present
