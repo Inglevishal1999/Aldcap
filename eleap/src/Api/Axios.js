@@ -1,15 +1,16 @@
 import axios from "axios";
 
-// ❌ REMOVE THE GENERIC LINK:
-// const API = axios.create({
-//   baseURL: "https://onrender.com",
-// });
 
 //  PASTE YOUR REAL, LIVE RUNNING BACKEND PATH:
+// ❌ MAKE SURE IT IS NOT THIS:
+// baseURL: "https://onrender.com",
+
+//  IT MUST BE YOUR EXACT BACKEND INSTANCE LINK:
 const API = axios.create({
   baseURL: "https://onrender.com",
   withCredentials: true,
 });
+
 
 // Automatically attach JWT token to headers if present
 API.interceptors.request.use(
