@@ -6,7 +6,7 @@ import {
   createGalleryItem,
   updateGalleryItem,
   deleteGalleryItem,
-} from "../controllers/galleryController.js";
+} from "../controllers/GalleryController.js";
 
 import {
   protect,
