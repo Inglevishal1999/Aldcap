@@ -1,9 +1,14 @@
 import axios from "axios";
 
-// Unified configuration instance directing traffic to your live backend cloud database
+// ❌ REMOVE THE GENERIC LINK:
+// const API = axios.create({
+//   baseURL: "https://onrender.com",
+// });
+
+//  PASTE YOUR REAL, LIVE RUNNING BACKEND PATH:
 const API = axios.create({
   baseURL: "https://onrender.com",
-  withCredentials: true, // Crucial for parsing user cookies and login sessions safely
+  withCredentials: true,
 });
 
 // Automatically attach JWT token to headers if present
