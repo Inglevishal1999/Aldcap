@@ -10,21 +10,24 @@ const defaultNews = [
     _id: "1",
     title: "New 132KV Substation Successfully Commissioned",
     date: "28 July 2026",
-    content: "ALDC Electrical has inaugurated a new high-capacity substation to improve power reliability.",
+    content:
+      "ALDC Electrical has inaugurated a new high-capacity substation to improve power reliability.",
     isNew: true,
   },
   {
     _id: "2",
     title: "Consumer Awareness Program on Electrical Safety",
     date: "20 July 2026",
-    content: "An awareness program was conducted to educate consumers about electrical safety and precautions.",
+    content:
+      "An awareness program was conducted to educate consumers about electrical safety and precautions.",
     isNew: true,
   },
   {
     _id: "3",
     title: "Scheduled Maintenance Work Completed",
     date: "15 July 2026",
-    content: "Routine maintenance work across main power transformers was successfully completed ahead of schedule.",
+    content:
+      "Routine maintenance work across main power transformers was successfully completed ahead of schedule.",
     isNew: false,
   },
 ];
@@ -51,10 +54,11 @@ export default function LatestNews() {
   };
 
   // We duplicate the list so when 50% translates, it perfectly overlays the second half seamlessly
-  const displayList = news.length > 0 ? [...news, ...news] : [...defaultNews, ...defaultNews];
+  const displayList =
+    news.length > 0 ? [...news, ...news] : [...defaultNews, ...defaultNews];
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col h-[480px] overflow-hidden">
+    <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex flex-col h-[550px] overflow-hidden">
       {/* Dynamic CSS Keyframes for Infinite Smooth Marquee */}
       <style>{`
         @keyframes verticalMarquee {
