@@ -1,18 +1,20 @@
 import axios from "axios";
 
-// Centrally routes your entire React app to your live backend cloud database instead of localhost
+// Connect React frontend to the deployed Render backend
 const API = axios.create({
-  baseURL: "https://onrender.com", // Fixed link with /api at the end!
+  baseURL: "https://elaap-backend-live.onrender.com/api",
   withCredentials: true,
 });
 
-// Automatically attach JWT token to headers if present
+// Automatically attach JWT token to requests
 API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => Promise.reject(error)
