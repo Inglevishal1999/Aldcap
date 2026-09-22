@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 // Uses your centralized Axios instance to point to the live Render cloud automatically
-import API from '../Api/Axios.js'; 
-
+import API from "../Api/Axios.js";
 
 export default function Login({ onLoginSuccess }) {
   const navigate = useNavigate();
@@ -122,14 +121,14 @@ export default function Login({ onLoginSuccess }) {
       } else {
         localStorage.removeItem("rememberedEmail");
       }
-
     } catch (error) {
       console.error("LOGIN ERROR:", error);
-      
+
       // Grabs the error message sent directly from your Render backend if it fails validation
       const serverMessage = error.response?.data?.message;
       setError(
-        serverMessage || "Unable to connect to the server. Make sure the backend is running."
+        serverMessage ||
+          "Unable to connect to the server. Make sure the backend is running.",
       );
     } finally {
       setLoading(false);
@@ -176,10 +175,13 @@ export default function Login({ onLoginSuccess }) {
 
           <div className="relative z-10 mt-auto p-10 pb-28">
             <h1 className="max-w-xl text-5xl font-extrabold leading-[1.05] text-white xl:text-6xl">
-              One key,<br />two circuits.
+              One key,
+              <br />
+              two circuits.
             </h1>
             <p className="mt-8 max-w-xl text-base leading-7 text-blue-200 xl:text-lg">
-              Admins manage the site. Employees manage their work. Same grid, different lines — sign in below with the credentials for yours.
+              Admins manage the site. Employees manage their work. Same grid,
+              different lines — sign in below with the credentials for yours.
             </p>
           </div>
 
@@ -253,7 +255,10 @@ export default function Login({ onLoginSuccess }) {
             {/* FORM */}
             <form onSubmit={handleLogin} className="space-y-6">
               <div>
-                <label htmlFor="email" className="mb-2 block text-sm font-semibold text-blue-950">
+                <label
+                  htmlFor="email"
+                  className="mb-2 block text-sm font-semibold text-blue-950"
+                >
                   Email
                 </label>
                 <input
@@ -270,12 +275,19 @@ export default function Login({ onLoginSuccess }) {
 
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <label htmlFor="password" className="block text-sm font-semibold text-blue-950">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-semibold text-blue-950"
+                  >
                     Password
                   </label>
                   <button
                     type="button"
-                    onClick={() => setError("Please contact the administrator to reset your password.")}
+                    onClick={() =>
+                      setError(
+                        "Please contact the administrator to reset your password.",
+                      )
+                    }
                     className="text-sm font-medium text-blue-700 hover:underline"
                   >
                     Forgot password?
@@ -324,9 +336,15 @@ export default function Login({ onLoginSuccess }) {
             {/* TEST ACCOUNT INFO */}
             {loginType === "admin" && (
               <div className="mt-8 rounded-xl border border-blue-100 bg-blue-50 p-4">
-                <p className="text-xs font-semibold text-blue-900">Test Admin Account</p>
-                <p className="mt-2 text-xs text-gray-600">Email: admin@test.com</p>
-                <p className="mt-1 text-xs text-gray-600">Password: Admin@12345</p>
+                <p className="text-xs font-semibold text-blue-900">
+                  Test Admin Account
+                </p>
+                <p className="mt-2 text-xs text-gray-600">
+                  Email: admin@test.com
+                </p>
+                <p className="mt-1 text-xs text-gray-600">
+                  Password: Admin@12345
+                </p>
               </div>
             )}
           </div>
