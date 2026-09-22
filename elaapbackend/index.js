@@ -38,7 +38,11 @@ const __dirname = path.dirname(__filename);
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    // ❌ CHANGE THIS:
+// origin: "http://localhost:5173",
+
+//  TO THIS:
+origin: ["http://localhost:5173", "https://vercel.app"],
     credentials: true,
   })
 );

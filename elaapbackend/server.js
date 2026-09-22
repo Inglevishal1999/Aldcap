@@ -48,23 +48,25 @@ if (NODE_ENV !== "test") {
 // ==========================================
 // CORS
 // ==========================================
-const allowedOrigins = (
-  process.env.ALLOWED_ORIGINS || "http://localhost:5173"
-)
-  .split(",")
-  .map((origin) => origin.trim());
+// Define exactly which websites are allowed to talk to this backend
+const allowedOrigins = [
+  "http://localhost:5173",       // Your local React development server
+  "https://vercel.app"    // Your live Vercel production website
+];
 
 app.use(
   cors({
     origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
       return callback(new Error("Not allowed by CORS"));
     },
-    credentials: true,
+    credentials: true, // Crucial for parsing login sessions and cookies
   })
 );
+
 
 // ==========================================
 // Body parsing
