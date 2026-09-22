@@ -1,3 +1,4 @@
+
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -33,19 +34,52 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ==========================================
-// Middleware
+// CORS
 // ==========================================
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://aldcap.vercel.app",
+];
 
 app.use(
   cors({
-    // ❌ CHANGE THIS:
-// origin: "http://localhost:5173",
+    origin: function (origin, callback) {
+      // Allow requests without an Origin header
+      // such as Postman or server-to-server requests
+      if (!origin) {
+        return callback(null, true);
+      }
 
-//  TO THIS:
-origin: ["http://localhost:5173", "https://vercel.app"],
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      console.log("CORS blocked origin:", origin);
+      return callback(new Error("Not allowed by CORS"));
+    },
+
     credentials: true,
+
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE",
+      "PATCH",
+      "OPTIONS",
+    ],
+
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+    ],
   })
 );
+
+// ==========================================
+// Body Parser
+// ==========================================
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -138,12 +172,14 @@ const startServer = async () => {
       console.log("======================================");
       console.log("       ELAP BACKEND STARTED");
       console.log("======================================");
-      console.log(`Server : http://localhost:${PORT}`);
-      console.log(`Status : http://localhost:${PORT}/api/status`);
-      console.log(`Gallery: http://localhost:${PORT}/api/gallery`);
-      console.log(`Blog   : http://localhost:${PORT}/api/blogs`);
-      console.log(`Duty Roster: http://localhost:${PORT}/api/duty-roster`);
-      console.log(`Uploads: http://localhost:${PORT}/uploads`);
+      console.log(`Server      : http://localhost:${PORT}`);
+      console.log(`Status      : http://localhost:${PORT}/api/status`);
+      console.log(`Gallery     : http://localhost:${PORT}/api/gallery`);
+      console.log(`Blog        : http://localhost:${PORT}/api/blogs`);
+      console.log(
+        `Duty Roster : http://localhost:${PORT}/api/duty-roster`
+      );
+      console.log(`Uploads     : http://localhost:${PORT}/uploads`);
       console.log("======================================");
       console.log("");
     });

@@ -48,11 +48,9 @@ export default function Login({ onLoginSuccess }) {
       // Replaced raw fetch() with your centralized API configuration instance
      // ❌ IF YOUR CODE LOOKS LIKE THIS:
 // const response = await API.get("/auth/login", { ... });
+console.log("EMAIL:", email);
+console.log("PASSWORD:", password);
 
-// ❌ OR IF IT LOOKS LIKE THIS:
-// const response = await API("/auth/login", { ... });
-
-//  CHANGE IT TO EXPLICITLY USE A POST REQUEST NATIVELY:
 const response = await API.post("/auth/login", {
   email: email.trim(),
   password: password,
