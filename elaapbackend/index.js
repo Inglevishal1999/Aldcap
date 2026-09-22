@@ -18,6 +18,7 @@ import serviceRoutes from "./routes/serviceRoutes.js";
 import newsRoutes from "./routes/newsRoutes.js";
 import galleryRoutes from "./routes/galleryRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
+import dutyRosterRoutes from "./routes/dutyRosterRoutes.js";
 
 dotenv.config();
 
@@ -93,6 +94,9 @@ app.use("/api/gallery", galleryRoutes);
 // BLOG
 app.use("/api/blogs", blogRoutes);
 
+// DUTY ROSTER
+app.use("/api/duty-roster", dutyRosterRoutes);
+
 // ==========================================
 // 404 Handler
 // ==========================================
@@ -134,6 +138,7 @@ const startServer = async () => {
       console.log(`Status : http://localhost:${PORT}/api/status`);
       console.log(`Gallery: http://localhost:${PORT}/api/gallery`);
       console.log(`Blog   : http://localhost:${PORT}/api/blogs`);
+      console.log(`Duty Roster: http://localhost:${PORT}/api/duty-roster`);
       console.log(`Uploads: http://localhost:${PORT}/uploads`);
       console.log("======================================");
       console.log("");

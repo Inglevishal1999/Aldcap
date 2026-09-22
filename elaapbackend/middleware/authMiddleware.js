@@ -1,10 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
-// ==========================================
 // PROTECT ROUTES
-// ==========================================
-
 export const protect = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -18,9 +15,16 @@ export const protect = async (req, res, next) => {
 
     const token = authHeader.split(" ")[1];
 
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required",
+      });
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const user = await User.findById(decoded.id).select("-password");
+    const user = await User.findById(decoded.id).select("-password").lean();
 
     if (!user) {
       return res.status(401).json({
@@ -39,6 +43,13 @@ export const protect = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({
+        success: false,
+        message: "Session expired, please log in again",
+      });
+    }
+
     console.error("Authentication error:", error.message);
     return res.status(401).json({
       success: false,
@@ -47,10 +58,7 @@ export const protect = async (req, res, next) => {
   }
 };
 
-// ==========================================
 // ADMIN ONLY
-// ==========================================
-
 export const adminOnly = (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({
@@ -69,10 +77,7 @@ export const adminOnly = (req, res, next) => {
   next();
 };
 
-// ==========================================
 // EMPLOYEE ONLY
-// ==========================================
-
 export const employeeOnly = (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({

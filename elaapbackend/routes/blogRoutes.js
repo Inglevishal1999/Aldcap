@@ -1,3 +1,4 @@
+
 import express from "express";
 
 import {
@@ -11,26 +12,22 @@ import {
 
 import { protect } from "../middleware/authMiddleware.js";
 import { adminOnly } from "../middleware/roleMiddleware.js";
-
 import blogUpload from "../middleware/blogUploadMiddleware.js";
 
 const router = express.Router();
 
-// ==========================================
-// PUBLIC / EMPLOYEE
-// ==========================================
+// =====================================================
+// PUBLIC
+// =====================================================
 
-// Published blogs only
+// GET /api/blogs
 router.get("/", getPublishedBlogs);
 
-// Single published blog
-router.get("/:id", getBlogById);
-
-// ==========================================
+// =====================================================
 // ADMIN
-// ==========================================
+// =====================================================
 
-// All blogs including Draft
+// GET /api/blogs/admin/all
 router.get(
   "/admin/all",
   protect,
@@ -38,7 +35,7 @@ router.get(
   getAllBlogs
 );
 
-// Create
+// POST /api/blogs
 router.post(
   "/",
   protect,
@@ -47,7 +44,7 @@ router.post(
   createBlog
 );
 
-// Update
+// PUT /api/blogs/:id
 router.put(
   "/:id",
   protect,
@@ -56,7 +53,7 @@ router.put(
   updateBlog
 );
 
-// Delete
+// DELETE /api/blogs/:id
 router.delete(
   "/:id",
   protect,
@@ -64,4 +61,12 @@ router.delete(
   deleteBlog
 );
 
+// =====================================================
+// PUBLIC SINGLE BLOG
+// =====================================================
+
+// GET /api/blogs/:id
+router.get("/:id", getBlogById);
+
 export default router;
+
