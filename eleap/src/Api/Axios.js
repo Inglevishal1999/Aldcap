@@ -1,16 +1,10 @@
 import axios from "axios";
 
-
-//  PASTE YOUR REAL, LIVE RUNNING BACKEND PATH:
-// ❌ MAKE SURE IT IS NOT THIS:
-// baseURL: "https://onrender.com",
-
-//  IT MUST BE YOUR EXACT BACKEND INSTANCE LINK:
+// Centrally routes your entire React app to your live backend cloud database instead of localhost
 const API = axios.create({
-  baseURL: "https://onrender.com",
+  baseURL: "https://onrender.com", // Fixed link with /api at the end!
   withCredentials: true,
 });
-
 
 // Automatically attach JWT token to headers if present
 API.interceptors.request.use(
