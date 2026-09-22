@@ -46,10 +46,18 @@ export default function Login({ onLoginSuccess }) {
       // SEND LOGIN REQUEST TO LIVE CLOUD BACKEND NATIVELY
       // =================================================
       // Replaced raw fetch() with your centralized API configuration instance
-      const response = await API.post("/auth/login", {
-        email: email.trim(),
-        password: password,
-      });
+     // ❌ IF YOUR CODE LOOKS LIKE THIS:
+// const response = await API.get("/auth/login", { ... });
+
+// ❌ OR IF IT LOOKS LIKE THIS:
+// const response = await API("/auth/login", { ... });
+
+//  CHANGE IT TO EXPLICITLY USE A POST REQUEST NATIVELY:
+const response = await API.post("/auth/login", {
+  email: email.trim(),
+  password: password,
+});
+
 
       // =================================================
       // READ BACKEND RESPONSE (Axios puts data inside .data)
