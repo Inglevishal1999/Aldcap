@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+// Uses your centralized Axios instance to point to the live Render cloud automatically
+import API from '../Api/api'; 
+
 
 export default function Login({ onLoginSuccess }) {
   const navigate = useNavigate();
@@ -41,57 +44,32 @@ export default function Login({ onLoginSuccess }) {
 
     try {
       // =================================================
-      // SEND LOGIN REQUEST TO BACKEND
+      // SEND LOGIN REQUEST TO LIVE CLOUD BACKEND NATIVELY
       // =================================================
-
-      const response = await fetch(
-        "http://localhost:5000/api/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: email.trim(),
-            password: password,
-          }),
-        }
-      );
+      // Replaced raw fetch() with your centralized API configuration instance
+      const response = await API.post("/auth/login", {
+        email: email.trim(),
+        password: password,
+      });
 
       // =================================================
-      // READ BACKEND RESPONSE
+      // READ BACKEND RESPONSE (Axios puts data inside .data)
       // =================================================
-
-      const data = await response.json();
+      const data = response.data;
 
       console.log("BACKEND LOGIN RESPONSE:", data);
 
       // =================================================
-      // BACKEND ERROR
-      // =================================================
-
-      if (!response.ok) {
-        setError(
-          data?.message || "Invalid email or password."
-        );
-        return;
-      }
-
-      // =================================================
       // CHECK SUCCESS
       // =================================================
-
       if (!data?.success) {
-        setError(
-          data?.message || "Login failed."
-        );
+        setError(data?.message || "Login failed.");
         return;
       }
 
       // =================================================
       // CHECK USER
       // =================================================
-
       if (!data?.user) {
         console.error("Backend response does not contain user:", data);
         setError("Invalid login response from server.");
@@ -101,7 +79,6 @@ export default function Login({ onLoginSuccess }) {
       // =================================================
       // CHECK ROLE
       // =================================================
-
       const backendRole = data.user.role;
 
       if (!backendRole) {
@@ -113,7 +90,6 @@ export default function Login({ onLoginSuccess }) {
       // =================================================
       // CHECK SELECTED LOGIN TYPE
       // =================================================
-
       if (loginType === "admin" && backendRole !== "admin") {
         setError("This account is not an admin account.");
         return;
@@ -127,7 +103,6 @@ export default function Login({ onLoginSuccess }) {
       // =================================================
       // SUCCESS: SAVE TOKEN TO LOCALSTORAGE & NOTIFY APP
       // =================================================
-
       console.log("LOGIN SUCCESS:", data);
 
       if (data?.token) {
@@ -142,7 +117,6 @@ export default function Login({ onLoginSuccess }) {
       // =================================================
       // OPTIONAL REMEMBER ME
       // =================================================
-
       if (rememberMe) {
         localStorage.setItem("rememberedEmail", email.trim());
       } else {
@@ -151,8 +125,11 @@ export default function Login({ onLoginSuccess }) {
 
     } catch (error) {
       console.error("LOGIN ERROR:", error);
+      
+      // Grabs the error message sent directly from your Render backend if it fails validation
+      const serverMessage = error.response?.data?.message;
       setError(
-        "Unable to connect to the server. Make sure the backend is running."
+        serverMessage || "Unable to connect to the server. Make sure the backend is running."
       );
     } finally {
       setLoading(false);
@@ -162,7 +139,6 @@ export default function Login({ onLoginSuccess }) {
   // =====================================================
   // SWITCH ADMIN / EMPLOYEE
   // =====================================================
-
   const handleLoginTypeChange = (type) => {
     setLoginType(type);
     setError("");
