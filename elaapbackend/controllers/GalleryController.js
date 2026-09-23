@@ -25,7 +25,7 @@ export const getGalleryItems = async (req, res) => {
       message: "Error fetching gallery items",
       error: error.message,
     });
-  }
+  }h
 };
 
 // ------------------------------------

@@ -52,6 +52,7 @@ function NavItem({ icon: Icon, label, active, onClick }) {
           }`}
         />
       )}
+
       <span className="truncate">{label}</span>
     </button>
   );
@@ -70,6 +71,7 @@ function SectionLabel({ children, open, onToggle }) {
       "
     >
       {children}
+
       <ChevronDown
         className={`h-3.5 w-3.5 transition-transform duration-200 ${
           open ? "rotate-0" : "-rotate-90"
@@ -90,50 +92,91 @@ export default function AdminSidebar({
 
   return (
     <>
-      {/* Dark overlay backdrop for mobile screens */}
+      {/* =========================================================
+          MOBILE BACKDROP
+      ========================================================= */}
       {isOpen && (
         <div
           onClick={onClose}
-          className="fixed inset-0 z-40 bg-black/50 transition-opacity lg:hidden"
+          className="
+            fixed inset-0 z-40
+            bg-black/50
+            transition-opacity
+            lg:hidden
+          "
         />
       )}
 
-      {/* Sidebar Drawer */}
+      {/* =========================================================
+          SIDEBAR
+      ========================================================= */}
       <aside
         className={`
-          fixed inset-y-0 left-0 z-50 flex h-screen w-64 flex-col bg-[#111f5c] text-white
-          transition-transform duration-300 ease-in-out lg:static lg:translate-x-0
+          fixed inset-y-0 left-0 z-50
+          flex h-dvh w-64 min-h-0 flex-col
+          bg-[#111f5c] text-white
+
+          transform
+          transition-transform duration-300 ease-in-out
+
+          lg:static
+          lg:translate-x-0
+
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
         `}
       >
-        {/* LOGO & MOBILE CLOSE BUTTON */}
-        <div className="flex items-center justify-between px-5 pb-4 pt-6">
+        {/* =======================================================
+            LOGO / HEADER
+        ======================================================= */}
+        <div className="flex shrink-0 items-center justify-between px-5 pb-4 pt-6">
           <div>
             <div className="flex items-center gap-2">
               <Zap className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+
               <span className="text-sm font-extrabold tracking-[0.2em] text-white">
                 ALDC ENERGY
               </span>
             </div>
+
             <p className="mt-1 pl-6 text-[11px] font-semibold tracking-[0.25em] text-blue-300">
               ADMIN PANEL
             </p>
           </div>
 
-          {/* Close button visible only on mobile */}
+          {/* Mobile Close Button */}
           <button
             onClick={onClose}
-            className="rounded-lg p-1 text-blue-300 hover:bg-white/10 hover:text-white lg:hidden"
+            className="
+              rounded-lg p-1
+              text-blue-300
+              hover:bg-white/10
+              hover:text-white
+              lg:hidden
+            "
             aria-label="Close menu"
+            type="button"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="mx-5 border-t border-white/10" />
+        {/* Header separator */}
+        <div className="mx-5 shrink-0 border-t border-white/10" />
 
-        {/* NAVIGATION LINKS */}
-        <nav className="scrollbar-none flex-1 overflow-y-auto px-3 pb-4">
+        {/* =======================================================
+            SCROLLABLE NAVIGATION
+        ======================================================= */}
+        <nav
+          className="
+            scrollbar-none
+            min-h-0
+            flex-1
+            overflow-y-auto
+            px-3
+            pb-4
+          "
+        >
+          {/* Dashboard */}
           <div className="pt-4">
             <NavItem
               icon={LayoutDashboard}
@@ -143,6 +186,9 @@ export default function AdminSidebar({
             />
           </div>
 
+          {/* =====================================================
+              WEBSITE
+          ===================================================== */}
           <SectionLabel
             open={websiteOpen}
             onToggle={() => setWebsiteOpen((v) => !v)}
@@ -164,6 +210,9 @@ export default function AdminSidebar({
             </div>
           )}
 
+          {/* =====================================================
+              COMMUNICATION
+          ===================================================== */}
           <SectionLabel open={true} onToggle={() => {}}>
             Communication
           </SectionLabel>
@@ -175,6 +224,9 @@ export default function AdminSidebar({
             onClick={() => onNavigate("messages")}
           />
 
+          {/* =====================================================
+              WORKFORCE
+          ===================================================== */}
           <SectionLabel open={true} onToggle={() => {}}>
             Workforce
           </SectionLabel>
@@ -187,10 +239,21 @@ export default function AdminSidebar({
           />
         </nav>
 
-        {/* FOOTER */}
-        <div className="mx-5 border-t border-white/10" />
+        {/* =======================================================
+            FOOTER
+            This section will NOT shrink.
+        ======================================================= */}
+        <div className="mx-5 shrink-0 border-t border-white/10" />
 
-        <div className="space-y-0.5 px-3 py-4">
+        <div
+          className="
+            shrink-0
+            space-y-0.5
+            px-3
+            py-4
+          "
+        >
+          {/* Settings */}
           <NavItem
             icon={Settings}
             label="Settings"
@@ -198,17 +261,28 @@ export default function AdminSidebar({
             onClick={() => onNavigate("settings")}
           />
 
+          {/* =====================================================
+              LOGOUT
+          ===================================================== */}
           <button
+            type="button"
             onClick={onLogout}
             className="
-              flex w-full items-center gap-3 rounded-xl
-              px-3 py-2.5 text-sm font-medium
-              text-red-300 transition-colors
-              hover:bg-red-500/10 hover:text-red-200
+              flex w-full items-center gap-3
+              rounded-xl
+              px-3 py-2.5
+              text-sm font-medium
+              text-red-300
+              transition-colors
+              hover:bg-red-500/10
+              hover:text-red-200
             "
           >
             <LogOut className="h-4 w-4 shrink-0" />
-            <span>Logout</span>
+
+            <span className="truncate">
+              Logout
+            </span>
           </button>
         </div>
       </aside>
