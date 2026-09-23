@@ -46,27 +46,26 @@ if (NODE_ENV !== "test") {
 }
 
 // ==========================================
-// CORS
+// CORS (Updated to match your actual frontend website)
 // ==========================================
-// Define exactly which websites are allowed to talk to this backend
 const allowedOrigins = [
-  "http://localhost:5173",       // Your local React development server
-  "https://vercel.app"    // Your live Vercel production website
+  "http://localhost:5173",       
+  "https://aldcap.vercel.app" // Fixed your live Vercel URL here
 ];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
       return callback(new Error("Not allowed by CORS"));
     },
-    credentials: true, // Crucial for parsing login sessions and cookies
+    credentials: true, 
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
 
 // ==========================================
 // Body parsing
@@ -117,10 +116,6 @@ app.use("/api/services", serviceRoutes);
 app.use("/api/news", newsRoutes);
 app.use("/api/gallery", galleryRoutes);
 app.use("/api/blogs", blogRoutes);
-
-// ==========================================
-// DUTY ROSTER
-// ==========================================
 app.use("/api/duty-roster", dutyRosterRoutes);
 
 // ==========================================
@@ -138,64 +133,24 @@ app.use((req, res) => {
 // ==========================================
 app.use((err, req, res, next) => {
   console.error("Server error:", err);
-
-  const message =
-    NODE_ENV === "production"
-      ? "Internal server error"
-      : err.message || "Internal server error";
-
-  res.status(err.status || 500).json({
-    success: false,
-    message,
-  });
+  const message = NODE_ENV === "production" ? "Internal server error" : err.message || "Internal server error";
+  res.status(err.status || 500).json({ success: false, message });
 });
 
 // ==========================================
-// Start Server (with graceful shutdown)
+// Start Server
 // ==========================================
 let server;
-
 const startServer = async () => {
   try {
     await connectDB();
-
     server = app.listen(PORT, () => {
-      console.log("");
-      console.log("======================================");
-      console.log("       ELAP BACKEND STARTED");
-      console.log("======================================");
-      console.log(`Env        : ${NODE_ENV}`);
-      console.log(`Server     : http://localhost:${PORT}`);
-      console.log(`Status     : http://localhost:${PORT}/api/status`);
-      console.log(`Gallery    : http://localhost:${PORT}/api/gallery`);
-      console.log(`Blog       : http://localhost:${PORT}/api/blogs`);
-      console.log(`Duty Roster: http://localhost:${PORT}/api/duty-roster`);
-      console.log(`Uploads    : http://localhost:${PORT}/uploads`);
-      console.log("======================================");
-      console.log("");
+      console.log(`Server running on port ${PORT}`);
     });
   } catch (error) {
     console.error("Failed to start server:", error.message);
     process.exit(1);
   }
 };
-
-const shutdown = (signal) => {
-  console.log(`\n${signal} received. Shutting down gracefully...`);
-  if (server) {
-    server.close(() => {
-      console.log("HTTP server closed.");
-      process.exit(0);
-    });
-  } else {
-    process.exit(0);
-  }
-};
-
-process.on("SIGINT", () => shutdown("SIGINT"));
-process.on("SIGTERM", () => shutdown("SIGTERM"));
-process.on("unhandledRejection", (reason) => {
-  console.error("Unhandled Rejection:", reason);
-});
 
 startServer();
