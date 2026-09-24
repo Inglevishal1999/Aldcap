@@ -1,4 +1,4 @@
-```jsx
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAdmin } from "./AdminContext";
 import API from "../Api/Axios.js";
@@ -702,4 +702,3 @@ export default function GalleryAdmin() {
     </div>
   );
 }
-```
