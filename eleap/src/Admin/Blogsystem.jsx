@@ -20,6 +20,15 @@ function getToken() {
     localStorage.getItem("token") ||
     localStorage.getItem("accessToken") ||
     localStorage.getItem("authToken") ||
+    localStorage.getItem("adminToken") ||
+    localStorage.getItem("jwt") ||
+    localStorage.getItem("jwtToken") ||
+    localStorage.getItem("access_token") ||
+    localStorage.getItem("auth_token") ||
+    sessionStorage.getItem("token") ||
+    sessionStorage.getItem("accessToken") ||
+    sessionStorage.getItem("authToken") ||
+    sessionStorage.getItem("adminToken") ||
     ""
   );
 }
