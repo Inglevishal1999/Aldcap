@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { Megaphone, Calendar, ArrowRight } from "lucide-react";
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/news/public";
+const API_URL = `${
+  import.meta.env.VITE_API_URL || "https://elaap-backend-live.onrender.com/api"
+}/news/public`;
 
 // Fallback data in case the database has no published items yet
 const defaultNews = [

@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Zap, Wrench, Shield, Activity, Cpu, Radio, Trash2 } from "lucide-react";
 
-const API_URL = "http://localhost:5000/api/services";
+const API_URL = `${
+  import.meta.env.VITE_API_URL || "https://elaap-backend-live.onrender.com/api"
+}/services`;
 
 export default function ServicesAdmin() {
   const [services, setServices] = useState([]);

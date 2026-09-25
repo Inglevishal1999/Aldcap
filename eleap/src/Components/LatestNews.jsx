@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 import { Megaphone, Calendar, ArrowRight } from "lucide-react";
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/news/public";
+const API_URL = `${
+  import.meta.env.VITE_API_URL || "https://elaap-backend-live.onrender.com/api"
+}/news/public`;
 
 const defaultNews = [
   {
