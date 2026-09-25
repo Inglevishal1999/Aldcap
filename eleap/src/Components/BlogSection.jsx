@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import BlogCard from "./BlogCard";
 
 const API_ORIGIN =
-  import.meta.env.VITE_API_URL || "http://localhost:5000";
+  import.meta.env.VITE_API_URL || "https://elaap-backend-live.onrender.com";
 
 const API_URL = `${API_ORIGIN}/api/blogs`;
 
