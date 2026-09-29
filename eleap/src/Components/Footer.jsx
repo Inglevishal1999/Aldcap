@@ -16,6 +16,7 @@ function Footer() {
     { label: "Home", path: "/" },
     { label: "About", path: "/about" },
     { label: "Blog", path: "/blog" },
+    { label: "Gallery", path: "/gallery" },
     { label: "Careers", path: "/careers" },
     { label: "News", path: "/news" },
     { label: "Contact", path: "/contact" },
