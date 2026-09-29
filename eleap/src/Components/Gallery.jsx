@@ -116,7 +116,7 @@ export default function Gallery() {
         />
 
         <div
-          className="pointer-events-none absolute -right-40 -top-40 h-[560px] w-[560px] rounded-full opacity-20 blur-3xl"
+          className="pointer-events-none absolute -right-40 -top-40 h-140 w-140 rounded-full opacity-20 blur-3xl"
           style={{
             background: "radial-gradient(circle, #F2A93B 0%, transparent 70%)",
           }}

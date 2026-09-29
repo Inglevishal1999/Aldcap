@@ -86,7 +86,7 @@ function HeroSlider() {
             }}
           >
             {/* Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-950/90 via-blue-900/70 to-transparent"></div>
+            <div className="absolute inset-0 bg-linear-to-r from-blue-950/90 via-blue-900/70 to-transparent"></div>
 
             {/* Content */}
             <div className="relative z-10 max-w-7xl mx-auto w-full px-5 sm:px-8 md:px-12 lg:px-16">

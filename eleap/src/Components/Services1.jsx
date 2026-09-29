@@ -56,16 +56,16 @@ const SERVICES = [
 
 export default function Services() {
   return (
-    <section className="relative w-full overflow-hidden bg-slate-50 py-14 sm:py-16 md:py-20 lg:py-20 xl:py-28">
+    <section className="relative w-full overflow-hidden bg-slate-50 py-14 border sm:py-16 md:py-20 px-2 lg:py-20 xl:py-28">
       
       {/* Background Decoration */}
       <div className="pointer-events-none absolute left-0 top-0 h-64 w-64 rounded-full bg-blue-100/40 blur-3xl" />
       <div className="pointer-events-none absolute bottom-0 right-0 h-72 w-72 rounded-full bg-yellow-100/40 blur-3xl" />
 
-      <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:max-w-[1500px]">
+      <div className="relative mx-auto w-full max-w-8xl px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:max-w-380">
 
         {/* ================= SECTION HEADER ================= */}
-        <div className="mx-auto mb-10 max-w-3xl text-center sm:mb-12 md:mb-14 lg:mb-16">
+        <div className="mx-auto mb-10 max-w-4xl text-center sm:mb-12 md:mb-14 lg:mb-16">
 
           {/* Small Label */}
           <div className="mb-3 flex items-center justify-center gap-3 sm:mb-4">
@@ -91,7 +91,7 @@ export default function Services() {
         </div>
 
         {/* ================= SERVICES GRID ================= */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-7 sm:px-15 xl:gap-8">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-7 sm:px-1 xl:gap-8">
 
           {SERVICES.map(({ icon: Icon, title, subtitle, description }) => (
             <ServiceCard
