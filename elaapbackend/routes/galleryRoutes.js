@@ -1,3 +1,4 @@
+
 import express from "express";
 
 import {
@@ -11,18 +12,21 @@ import {
 import {
   protect,
   adminOnly,
+  upload,
 } from "../middleware/authMiddleware.js";
-
-import upload from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
 
-// GET all gallery items
+// =====================================================
+// GET ALL GALLERY ITEMS
 // Public
+// =====================================================
 router.get("/", getGalleryItems);
 
-// CREATE gallery item
+// =====================================================
+// CREATE GALLERY ITEM
 // Admin only
+// =====================================================
 router.post(
   "/",
   protect,
@@ -31,12 +35,19 @@ router.post(
   createGalleryItem
 );
 
-// GET single gallery item
+// =====================================================
+// GET SINGLE GALLERY ITEM
 // Public
-router.get("/:id", getGalleryItemById);
+// =====================================================
+router.get(
+  "/:id",
+  getGalleryItemById
+);
 
-// UPDATE gallery item
+// =====================================================
+// UPDATE GALLERY ITEM
 // Admin only
+// =====================================================
 router.put(
   "/:id",
   protect,
@@ -45,8 +56,10 @@ router.put(
   updateGalleryItem
 );
 
-// DELETE gallery item
+// =====================================================
+// DELETE GALLERY ITEM
 // Admin only
+// =====================================================
 router.delete(
   "/:id",
   protect,
