@@ -91,7 +91,7 @@ export default function LatestNews() {
         .marquee-track {
           display: flex;
           flex-direction: column;
-          animation: verticalMarquee 30s linear infinite;
+          animation: verticalMarquee 10s linear infinite;
         }
 
         .marquee-container:hover .marquee-track {

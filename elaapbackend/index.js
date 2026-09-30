@@ -15,7 +15,6 @@ import heroSliderRoutes from "./routes/heroSliderRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import aboutRoutes from "./routes/aboutRoutes.js";
 import serviceRoutes from "./routes/serviceRoutes.js";
-import newsRoutes from "./routes/newsRoutes.js";
 import galleryRoutes from "./routes/galleryRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
 import dutyRosterRoutes from "./routes/dutyRosterRoutes.js";

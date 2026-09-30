@@ -145,7 +145,8 @@ export default function News() {
                 <button
                   type="button"
                   onClick={() => setSelected(item)}
-                  className="inline-flex items-center gap-1.5 text-sm font-bold text-blue-600 hover:text-blue-800 transition"
+                  className="inline-flex items-center gap-1.5 text-sm font-bold text-blue-600 hover:text-blue-800 transition "
+                  
                 >
                   Read More <ArrowRight size={16} />
                 </button>
