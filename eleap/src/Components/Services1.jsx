@@ -56,7 +56,7 @@ const SERVICES = [
 
 export default function Services() {
   return (
-    <section className="relative w-full overflow-hidden bg-slate-50 py-14 border sm:py-16 md:py-20 px-2 lg:py-20 xl:py-28">
+    <section className="relative w-full overflow-hidden bg-slate-50 py-14 sm:py-16 md:py-20 px-2 lg:py-20 xl:py-28">
       
       {/* Background Decoration */}
       <div className="pointer-events-none absolute left-0 top-0 h-64 w-64 rounded-full bg-blue-100/40 blur-3xl" />
