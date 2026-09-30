@@ -3,9 +3,9 @@ import { ArrowRight } from "lucide-react";
 
 /* Use consistent lowercase file names (rename Image3.jpg -> image3.jpg),
    otherwise the build breaks on case-sensitive Linux hosts. */
-import image1 from "../assets/image1.jpg";
+import image1 from "../assets/blog1.jpeg";
 import image2 from "../assets/image2.jpg";
-import image3 from "../assets/image3.jpg";
+import image3 from "../assets/Image3.jpg";
 
 /* Replace these with real photos (image4.jpg, image5.jpg, image6.jpg)
    when available so the captions match the pictures. */
