@@ -170,7 +170,7 @@ export default function AldcAboutPortalLayout({ adminImages }) {
       </div>
 
       {/* 4. Full-Width Dynamic Image Block */}
-      <div className="relative overflow-hidden w-full h-48 sm:h-72 md:h-[400px] rounded-xl shadow-lg border border-slate-200 bg-slate-900 transition-all duration-300">
+      <div className="relative overflow-hidden w-full h-48 sm:h-72 md:h-100 rounded-xl shadow-lg border border-slate-200 bg-slate-900 transition-all duration-300">
         <img
           src={active.imageUrl}
           alt={active.imageAlt}
@@ -182,7 +182,7 @@ export default function AldcAboutPortalLayout({ adminImages }) {
           className="w-full h-full object-cover filter brightness-90"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-slate-950/80 via-transparent to-transparent"></div>
 
         <div className="absolute top-3 left-3 sm:top-4 sm:left-4 bg-slate-900/85 backdrop-blur-sm border border-white/20 text-[#ffb703] font-mono text-[9px] sm:text-[10px] font-bold tracking-widest px-2.5 py-1 rounded shadow-sm">
           {active.badgeText}

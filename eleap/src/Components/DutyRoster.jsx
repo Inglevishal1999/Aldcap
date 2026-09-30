@@ -26,7 +26,7 @@ const COLS = "grid grid-cols-[10rem_minmax(0,1fr)] xl:grid-cols-[7.5rem_minmax(0
 
 export default function DutyRoster() {
   return (
-    <div className="flex h-auto min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm lg:h-[600px]">
+    <div className="flex h-auto min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm lg:h-150">
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-100 px-4 py-4 sm:px-6 sm:py-5">
         <div className="flex min-w-0 items-center gap-2">
@@ -63,7 +63,7 @@ export default function DutyRoster() {
               <div
                 key={`${row.shift}-${idx}`}
                 role="row"
-                className={`${COLS} min-h-[3.5rem] flex-1 items-center ${
+                className={`${COLS} min-h-14 flex-1 items-center ${
                   idx % 2 === 0 ? "bg-white" : "bg-slate-50"
                 }`}
               >

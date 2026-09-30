@@ -19,6 +19,7 @@ import newsRoutes from "./routes/newsRoutes.js";
 import galleryRoutes from "./routes/galleryRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
 import dutyRosterRoutes from "./routes/dutyRosterRoutes.js";
+import newsRoutes from "./routes/newsRoutes.js";
 
 // ==========================================
 // Environment Variables
@@ -122,6 +123,8 @@ app.use("/api/news", newsRoutes);
 app.use("/api/gallery", galleryRoutes);
 
 app.use("/api/blogs", blogRoutes);
+
+app.use("app/news", newsRoutes);
 
 app.use("/api/duty-roster", dutyRosterRoutes);
 

@@ -62,7 +62,7 @@ export default function Services() {
       <div className="pointer-events-none absolute left-0 top-0 h-64 w-64 rounded-full bg-blue-100/40 blur-3xl" />
       <div className="pointer-events-none absolute bottom-0 right-0 h-72 w-72 rounded-full bg-yellow-100/40 blur-3xl" />
 
-      <div className="relative mx-auto w-full max-w-8xl px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:max-w-380">
+      <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 2xl:max-w-380">
 
         {/* ================= SECTION HEADER ================= */}
         <div className="mx-auto mb-10 max-w-4xl text-center sm:mb-12 md:mb-14 lg:mb-16">
@@ -91,7 +91,7 @@ export default function Services() {
         </div>
 
         {/* ================= SERVICES GRID ================= */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-7 sm:px-1 xl:gap-8">
+        <div className="grid grid-cols-1 max-w-8xl gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-7 sm:px-1 xl:gap-8">
 
           {SERVICES.map(({ icon: Icon, title, subtitle, description }) => (
             <ServiceCard
@@ -123,7 +123,7 @@ function ServiceCard({
   return (
     <article
       className="
-        group relative flex min-h-[280px] flex-col
+        group relative flex min-h-70 flex-col
         overflow-hidden rounded-2xl
         border border-blue-100
         bg-white
@@ -136,11 +136,11 @@ function ServiceCard({
         hover:shadow-xl
 
         sm:p-7
-        md:min-h-[290px]
+        md:min-h-72.5
         md:p-8
-        lg:min-h-[300px]
+        lg:min-h-75
         lg:p-8
-        xl:min-h-[310px]
+        xl:min-h-77.5
       "
     >
 

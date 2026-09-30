@@ -81,7 +81,7 @@ export default function LatestNews() {
   const displayList = [...source, ...source];
 
   return (
-    <div className="flex h-[600px] flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+    <div className="flex h-150 flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
       <style>{`
         @keyframes verticalMarquee {
           from { transform: translateY(0); }
@@ -128,7 +128,7 @@ export default function LatestNews() {
       </div>
 
       {/* Infinite scroll wrapper */}
-      <div className="marquee-container relative flex-grow overflow-hidden">
+      <div className="marquee-container relative grow overflow-hidden">
         <div className="marquee-track">
           {displayList.map((item, index) => (
             <div

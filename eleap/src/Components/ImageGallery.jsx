@@ -20,7 +20,7 @@ const gallery = [
 
 export default function ImageGallery() {
   return (
-    <div className="flex h-[600px] flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+    <div className="flex h-150 flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
       {/* Header */}
       <div className="shrink-0 bg-blue-800 px-6 py-4 text-white">
         <h2 className="text-lg font-bold">Image Gallery</h2>

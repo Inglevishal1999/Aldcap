@@ -6,6 +6,7 @@ const newsSchema = new mongoose.Schema(
     content: { type: String, required: true },
     date: { type: String, required: true },
     status: { type: String, enum: ["Published", "Draft"], default: "Published" },
+    link: { type: String, default: "" },
     isNewBadge: { type: Boolean, default: true },
   },
   { timestamps: true }
