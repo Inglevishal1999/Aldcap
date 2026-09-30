@@ -123,7 +123,7 @@ app.use("/api/gallery", galleryRoutes);
 
 app.use("/api/blogs", blogRoutes);
 
-app.use("app/news", newsRoutes);
+app.use("/api/news", newsRoutes);
 
 app.use("/api/duty-roster", dutyRosterRoutes);
 
