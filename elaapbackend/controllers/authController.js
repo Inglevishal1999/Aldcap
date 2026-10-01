@@ -1,62 +1,144 @@
-import User from "../models/User.js"; 
+
+import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const loginUser = async (req, res) => {
+  const startTime = performance.now();
+
   try {
-    // 1. Destructure incoming payload keys matching your React state strings
+    // Get login credentials
     const { email, password } = req.body;
 
-    // 2. Validate input fields are present
+    // Validate input
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Please provide both an email and password."
+        message: "Please provide both an email and password.",
       });
     }
 
-    // 3. Look up user by lowercase email string
-    const user = await User.findOne({ email: email.toLowerCase().trim() });
-    if (!user) {
-      return res.status(401).json({ 
-        success: false, 
-        message: "Invalid email or password." 
-      });
-    }
+    // Normalize email
+    const normalizedEmail = email.trim().toLowerCase();
 
-    // 4. Verify the submitted password against the database hash
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (!isPasswordCorrect) {
-      return res.status(401).json({ 
-        success: false, 
-        message: "Invalid email or password." 
-      });
-    }
+    // Find user
+    const dbStart = performance.now();
 
-    // 5. Generate JSON Web Token (JWT) securely
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET || "fallback_secret_key",
-      { expiresIn: "1d" }
+    const user = await User.findOne({
+      email: normalizedEmail,
+    }).lean();
+
+    const dbTime = Math.round(
+      performance.now() - dbStart
     );
 
-    // 6. Return the exact object structure your React frontend expects
+    console.log(`Login DB query: ${dbTime} ms`);
+
+    // User not found
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password.",
+      });
+    }
+
+    // Verify password
+    const bcryptStart = performance.now();
+
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      user.password
+    );
+
+    const bcryptTime = Math.round(
+      performance.now() - bcryptStart
+    );
+
+    console.log(
+      `Password verification: ${bcryptTime} ms`
+    );
+
+    // Wrong password
+    if (!isPasswordCorrect) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password.",
+      });
+    }
+
+    // Make sure JWT secret exists
+    if (!process.env.JWT_SECRET) {
+      console.error(
+        "JWT_SECRET is missing from environment variables."
+      );
+
+      return res.status(500).json({
+        success: false,
+        message:
+          "Authentication service is not configured correctly.",
+      });
+    }
+
+    // Generate JWT
+    const tokenStart = performance.now();
+
+    const token = jwt.sign(
+      {
+        id: user._id,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d",
+      }
+    );
+
+    const tokenTime = Math.round(
+      performance.now() - tokenStart
+    );
+
+    console.log(
+      `JWT generation: ${tokenTime} ms`
+    );
+
+    // Total controller time
+    const totalTime = Math.round(
+      performance.now() - startTime
+    );
+
+    console.log(
+      `Total login controller time: ${totalTime} ms`
+    );
+
+    // Send response
     return res.status(200).json({
       success: true,
       message: "Access granted. Login successful.",
-      token: token,
+      token,
+
       user: {
         id: user._id,
         email: user.email,
-        role: user.role // Returns "admin" or "employee" to pass React validation rules
-      }
+        role: user.role,
+      },
     });
-
   } catch (error) {
-    console.error("Login verification system error:", error);
-    return res.status(500).json({ 
-      success: false, 
-      message: "Unable to connect to the login service due to a server error." 
+    const totalTime = Math.round(
+      performance.now() - startTime
+    );
+
+    console.error(
+      "Login verification error:",
+      error
+    );
+
+    console.error(
+      `Login failed after: ${totalTime} ms`
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to process login request.",
     });
   }
 };
