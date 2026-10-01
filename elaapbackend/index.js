@@ -1,4 +1,3 @@
-
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -43,6 +42,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // =====================================================
+// UPLOADS DIRECTORY
+// =====================================================
+
+const uploadsPath = path.join(__dirname, "uploads");
+
+console.log("======================================");
+console.log("Backend directory:", __dirname);
+console.log("Uploads directory:", uploadsPath);
+console.log("======================================");
+
+// =====================================================
 // CORS
 // =====================================================
 
@@ -54,8 +64,6 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests without Origin
-      // Example: Postman/server-to-server
       if (!origin) {
         return callback(null, true);
       }
@@ -64,10 +72,7 @@ app.use(
         return callback(null, true);
       }
 
-      console.log(
-        "CORS blocked origin:",
-        origin
-      );
+      console.log("CORS blocked origin:", origin);
 
       return callback(
         new Error("Not allowed by CORS")
@@ -107,25 +112,10 @@ app.use(
 // =====================================================
 // STATIC UPLOADS
 // =====================================================
-//
-// Physical file:
-// backend/uploads/example.jpg
-//
-// Browser URL:
-// /uploads/example.jpg
-//
-// Local:
-// http://localhost:5000/uploads/example.jpg
-//
-// Production:
-// https://elaap-backend-live.onrender.com/uploads/example.jpg
-// =====================================================
 
 app.use(
   "/uploads",
-  express.static(
-    path.join(__dirname, "uploads")
-  )
+  express.static(uploadsPath)
 );
 
 // =====================================================
@@ -135,8 +125,7 @@ app.use(
 app.get("/api/status", (req, res) => {
   res.status(200).json({
     success: true,
-    message:
-      "ELAP backend is running perfectly!",
+    message: "ELAP backend is running perfectly!",
   });
 });
 
@@ -144,50 +133,23 @@ app.get("/api/status", (req, res) => {
 // API ROUTES
 // =====================================================
 
-app.use(
-  "/api/auth",
-  authRoutes
-);
+app.use("/api/auth", authRoutes);
 
-app.use(
-  "/api/sliders",
-  heroSliderRoutes
-);
+app.use("/api/sliders", heroSliderRoutes);
 
-app.use(
-  "/api/courses",
-  courseRoutes
-);
+app.use("/api/courses", courseRoutes);
 
-app.use(
-  "/api/about",
-  aboutRoutes
-);
+app.use("/api/about", aboutRoutes);
 
-app.use(
-  "/api/services",
-  serviceRoutes
-);
+app.use("/api/services", serviceRoutes);
 
-app.use(
-  "/api/gallery",
-  galleryRoutes
-);
+app.use("/api/gallery", galleryRoutes);
 
-app.use(
-  "/api/blogs",
-  blogRoutes
-);
+app.use("/api/blogs", blogRoutes);
 
-app.use(
-  "/api/news",
-  newsRoutes
-);
+app.use("/api/news", newsRoutes);
 
-app.use(
-  "/api/duty-roster",
-  dutyRosterRoutes
-);
+app.use("/api/duty-roster", dutyRosterRoutes);
 
 // =====================================================
 // API ROOT
@@ -207,8 +169,7 @@ app.get("/api", (req, res) => {
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message:
-      `Route not found: ${req.method} ${req.originalUrl}`,
+    message: `Route not found: ${req.method} ${req.originalUrl}`,
   });
 });
 
@@ -216,23 +177,16 @@ app.use((req, res) => {
 // ERROR HANDLER
 // =====================================================
 
-app.use(
-  (err, req, res, next) => {
-    console.error(
-      "SERVER ERROR:",
-      err
-    );
+app.use((err, req, res, next) => {
+  console.error("SERVER ERROR:", err);
 
-    res.status(
-      err.status || 500
-    ).json({
-      success: false,
-      message:
-        err.message ||
-        "Internal server error",
-    });
-  }
-);
+  res.status(err.status || 500).json({
+    success: false,
+    message:
+      err.message ||
+      "Internal server error",
+  });
+});
 
 // =====================================================
 // CONNECT DATABASE + START SERVER
@@ -241,45 +195,19 @@ app.use(
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(
-        "======================================"
-      );
-
-      console.log(
-        "ELAP BACKEND STARTED"
-      );
-
-      console.log(
-        `Server running on port: ${PORT}`
-      );
-
-      console.log(
-        `Status: /api/status`
-      );
-
-      console.log(
-        `Auth: /api/auth`
-      );
-
-      console.log(
-        `Blogs: /api/blogs`
-      );
-
-      console.log(
-        `Gallery: /api/gallery`
-      );
-
-      console.log(
-        `Duty Roster: /api/duty-roster`
-      );
-
-      console.log(
-        `Uploads: /uploads`
-      );
-
-      console.log(
-        "======================================"
-      );
+      console.log("======================================");
+      console.log("ELAP BACKEND STARTED");
+      console.log(`Server running on port: ${PORT}`);
+      console.log(`Status: /api/status`);
+      console.log(`API: /api`);
+      console.log(`Auth: /api/auth`);
+      console.log(`Blogs: /api/blogs`);
+      console.log(`Gallery: /api/gallery`);
+      console.log(`News: /api/news`);
+      console.log(`Duty Roster: /api/duty-roster`);
+      console.log(`Uploads: /uploads`);
+      console.log(`Uploads path: ${uploadsPath}`);
+      console.log("======================================");
     });
   })
   .catch((err) => {

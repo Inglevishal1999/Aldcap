@@ -1,8 +1,11 @@
-
 import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
+
+// =====================================================
+// ES MODULE __dirname
+// =====================================================
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,6 +13,7 @@ const __dirname = path.dirname(__filename);
 // =====================================================
 // GALLERY UPLOAD DIRECTORY
 // =====================================================
+
 const uploadDir = path.join(
   __dirname,
   "..",
@@ -17,14 +21,23 @@ const uploadDir = path.join(
   "gallery"
 );
 
-// Create directory if it doesn't exist
+// =====================================================
+// CREATE DIRECTORY
+// =====================================================
+
 fs.mkdirSync(uploadDir, {
   recursive: true,
 });
 
+console.log(
+  "Gallery upload directory:",
+  uploadDir
+);
+
 // =====================================================
 // MULTER STORAGE
 // =====================================================
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
@@ -47,6 +60,7 @@ const storage = multer.diskStorage({
 // =====================================================
 // FILE FILTER
 // =====================================================
+
 const fileFilter = (req, file, cb) => {
   const allowedTypes = [
     "image/jpeg",
@@ -71,6 +85,7 @@ const fileFilter = (req, file, cb) => {
 // =====================================================
 // MULTER
 // =====================================================
+
 const upload = multer({
   storage,
   fileFilter,
@@ -81,4 +96,3 @@ const upload = multer({
 });
 
 export default upload;
-

@@ -1,7 +1,12 @@
+
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import API from "../Api/Axios.js";
-import AuthLayout, { Field, Alert, Spinner } from "../Pages/Authlayout.jsx";
+import AuthLayout, {
+  Field,
+  Alert,
+  Spinner,
+} from "../Pages/Authlayout.jsx";
 
 export default function Login({ onLoginSuccess }) {
   const location = useLocation();
@@ -14,104 +19,270 @@ export default function Login({ onLoginSuccess }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Message coming from the Sign Up page after account creation
+  // Message coming from Sign Up page
   const successMessage = location.state?.message;
 
-  // ---------------- LOGIN LOGIC (unchanged) ----------------
+  // =====================================================
+  // LOGIN
+  // =====================================================
+
   const handleLogin = async (e) => {
     e.preventDefault();
+
     if (loading) return;
+
     setError("");
 
     const cleanEmail = email.trim();
-    if (!cleanEmail) return setError("Please enter your email.");
-    if (!password) return setError("Please enter your password.");
+
+    if (!cleanEmail) {
+      return setError("Please enter your email.");
+    }
+
+    if (!password) {
+      return setError("Please enter your password.");
+    }
 
     setLoading(true);
+
     const startTime = performance.now();
 
     try {
       console.log("Login request started...");
+
       const response = await API.post("/auth/login", {
-        email: email.trim(),
+        email: cleanEmail,
         password,
       });
+
       console.log(
         `Login API response time: ${Math.round(
-          performance.now() - startTime,
-        )} ms`,
+          performance.now() - startTime
+        )} ms`
       );
 
       const data = response.data;
+
       console.log("Login response:", {
         success: data?.success,
         role: data?.user?.role,
       });
 
-      if (!data?.success) return setError(data?.message || "Login failed.");
-      if (!data?.user)
-        return setError("Login succeeded, but user information is missing.");
-      if (!data?.token)
+      // =================================================
+      // VALIDATE RESPONSE
+      // =================================================
+
+      if (!data?.success) {
         return setError(
-          "Login succeeded, but authentication token is missing.",
+          data?.message || "Login failed."
         );
+      }
 
-      const backendRole = data.user.role;
-      if (!backendRole)
-        return setError("User role is missing from the server response.");
+      if (!data?.user) {
+        return setError(
+          "Login succeeded, but user information is missing."
+        );
+      }
 
-      if (loginType === "admin" && backendRole !== "admin")
-        return setError("This account does not have admin access.");
-      if (loginType === "employee" && backendRole !== "employee")
-        return setError("This account does not have employee access.");
+      if (!data?.token) {
+        return setError(
+          "Login succeeded, but authentication token is missing."
+        );
+      }
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      // =================================================
+      // GET ROLE FROM BACKEND
+      // =================================================
 
-      if (rememberMe) localStorage.setItem("rememberedEmail", cleanEmail);
-      else localStorage.removeItem("rememberedEmail");
+      const backendRole = String(
+        data.user.role || ""
+      )
+        .trim()
+        .toLowerCase();
+
+      if (!backendRole) {
+        return setError(
+          "User role is missing from the server response."
+        );
+      }
+
+      // =================================================
+      // CHECK SELECTED LOGIN TYPE
+      // =================================================
+
+      if (
+        loginType === "admin" &&
+        backendRole !== "admin"
+      ) {
+        return setError(
+          "This account does not have admin access."
+        );
+      }
+
+      if (
+        loginType === "employee" &&
+        backendRole !== "employee"
+      ) {
+        return setError(
+          "This account does not have employee access."
+        );
+      }
+
+      // =================================================
+      // CLEAN OLD SESSION
+      // =================================================
+
+      localStorage.removeItem("session");
+      localStorage.removeItem("token");
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("user");
+
+      // =================================================
+      // CREATE USER
+      // =================================================
+
+      const loggedInUser = {
+        ...data.user,
+        role: backendRole,
+      };
+
+      // =================================================
+      // STORE TOKEN
+      // =================================================
+
+      localStorage.setItem(
+        "token",
+        data.token
+      );
+
+      localStorage.setItem(
+        "authToken",
+        data.token
+      );
+
+      // =================================================
+      // STORE USER
+      // =================================================
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(loggedInUser)
+      );
+
+      // =================================================
+      // REMEMBER EMAIL
+      // =================================================
+
+      if (rememberMe) {
+        localStorage.setItem(
+          "rememberedEmail",
+          cleanEmail
+        );
+      } else {
+        localStorage.removeItem(
+          "rememberedEmail"
+        );
+      }
 
       console.log("Login successful.");
-      // App.jsx handles session + redirect. Do NOT call navigate() here.
-      if (typeof onLoginSuccess === "function") onLoginSuccess(data);
+      console.log(
+        "Authenticated role:",
+        loggedInUser.role
+      );
+
+      // App.jsx handles session + redirect
+      if (
+        typeof onLoginSuccess === "function"
+      ) {
+        onLoginSuccess({
+          ...data,
+          user: loggedInUser,
+        });
+      }
     } catch (error) {
-      console.error("Login request failed:", error);
+      console.error(
+        "Login request failed:",
+        error
+      );
 
       if (error.response) {
-        const status = error.response.status;
-        const msg = error.response.data?.message || error.response.data?.error;
-        if (status === 401) setError(msg || "Invalid email or password.");
-        else if (status === 403)
-          setError(msg || "You do not have permission to access this account.");
-        else if (status >= 500)
-          setError(msg || "Server error. Please try again after a moment.");
-        else setError(msg || "Login failed.");
+        const status =
+          error.response.status;
+
+        const msg =
+          error.response.data?.message ||
+          error.response.data?.error;
+
+        if (status === 401) {
+          setError(
+            msg ||
+              "Invalid email or password."
+          );
+        } else if (status === 403) {
+          setError(
+            msg ||
+              "You do not have permission to access this account."
+          );
+        } else if (status >= 500) {
+          setError(
+            msg ||
+              "Server error. Please try again after a moment."
+          );
+        } else {
+          setError(
+            msg || "Login failed."
+          );
+        }
+
         return;
       }
-      if (error.code === "ECONNABORTED")
+
+      if (
+        error.code === "ECONNABORTED"
+      ) {
         return setError(
-          "The server is taking too long to respond. Please try again.",
+          "The server is taking too long to respond. Please try again."
         );
-      if (error.request)
+      }
+
+      if (error.request) {
         return setError(
-          "Unable to connect to the server. Please check your internet connection.",
+          "Unable to connect to the server. Please check your internet connection."
         );
-      setError("Something went wrong. Please try again.");
+      }
+
+      setError(
+        "Something went wrong. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  
-  const handleLoginTypeChange = (type) => {
+  // =====================================================
+  // LOGIN TYPE CHANGE
+  // =====================================================
+
+  const handleLoginTypeChange = (
+    type
+  ) => {
     if (loading) return;
+
     setLoginType(type);
     setError("");
     setPassword("");
-    setEmail(type === "admin" ? "admin@test.com" : "");
+
+    setEmail(
+      type === "admin"
+        ? "admin@test.com"
+        : ""
+    );
   };
 
-  // ---------------- UI ----------------
+  // =====================================================
+  // UI
+  // =====================================================
+
   return (
     <AuthLayout
       eyebrow="Sign in"
@@ -127,36 +298,54 @@ export default function Login({ onLoginSuccess }) {
       }
     >
       {/* Role switch */}
+
       <div className="mb-8 flex rounded-full bg-slate-100 p-1">
-        {["admin", "employee"].map((type) => (
-          <button
-            key={type}
-            type="button"
-            onClick={() => handleLoginTypeChange(type)}
-            disabled={loading}
-            className={`min-h-[44px] flex-1 rounded-full px-5 text-sm font-semibold capitalize transition-all duration-300 ${
-              loginType === type
-                ? "bg-[#ffc800] text-[#0d1a6e] shadow-md"
-                : "text-gray-500 hover:text-[#0d1a6e]"
-            }`}
-          >
-            {type}
-          </button>
-        ))}
+        {["admin", "employee"].map(
+          (type) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() =>
+                handleLoginTypeChange(
+                  type
+                )
+              }
+              disabled={loading}
+              className={`min-h-[44px] flex-1 rounded-full px-5 text-sm font-semibold capitalize transition-all duration-300 ${
+                loginType === type
+                  ? "bg-[#ffc800] text-[#0d1a6e] shadow-md"
+                  : "text-gray-500 hover:text-[#0d1a6e]"
+              }`}
+            >
+              {type}
+            </button>
+          )
+        )}
       </div>
 
-      {successMessage && !error && (
-        <Alert type="success">{successMessage}</Alert>
-      )}
-      {error && <Alert>{error}</Alert>}
+      {successMessage &&
+        !error && (
+          <Alert type="success">
+            {successMessage}
+          </Alert>
+        )}
 
-      <form onSubmit={handleLogin} className="space-y-5 sm:space-y-6">
+      {error && (
+        <Alert>{error}</Alert>
+      )}
+
+      <form
+        onSubmit={handleLogin}
+        className="space-y-5 sm:space-y-6"
+      >
         <Field
           id="email"
           label="Email"
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) =>
+            setEmail(e.target.value)
+          }
           placeholder="Enter your email"
           autoComplete="email"
           disabled={loading}
@@ -167,7 +356,9 @@ export default function Login({ onLoginSuccess }) {
           label="Password"
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) =>
+            setPassword(e.target.value)
+          }
           placeholder="Enter your password"
           autoComplete="current-password"
           disabled={loading}
@@ -177,7 +368,7 @@ export default function Login({ onLoginSuccess }) {
               disabled={loading}
               onClick={() =>
                 setError(
-                  "Please contact the administrator to reset your password.",
+                  "Please contact the administrator to reset your password."
                 )
               }
               className="text-sm font-medium text-blue-700 hover:underline disabled:opacity-50"
@@ -191,10 +382,15 @@ export default function Login({ onLoginSuccess }) {
           <input
             type="checkbox"
             checked={rememberMe}
-            onChange={(e) => setRememberMe(e.target.checked)}
+            onChange={(e) =>
+              setRememberMe(
+                e.target.checked
+              )
+            }
             disabled={loading}
             className="h-4 w-4 rounded border-gray-300 accent-blue-800"
           />
+
           Remember me
         </label>
 
@@ -208,6 +404,7 @@ export default function Login({ onLoginSuccess }) {
               <span className="mr-3">
                 <Spinner />
               </span>
+
               Signing in...
             </>
           ) : (
@@ -216,10 +413,13 @@ export default function Login({ onLoginSuccess }) {
         </button>
       </form>
 
-      {/* SIGN UP BUTTON */}
+      {/* SIGN UP */}
+
       <div className="my-6 flex items-center gap-3 text-xs text-gray-400">
         <span className="h-px flex-1 bg-slate-200" />
+
         New to ALDC Energy?
+
         <span className="h-px flex-1 bg-slate-200" />
       </div>
 
@@ -230,14 +430,21 @@ export default function Login({ onLoginSuccess }) {
         Create new account
       </Link>
 
-      {/* Dev helper: remove before production */}
+      {/* DEV ADMIN ACCOUNT */}
+
       {loginType === "admin" && (
         <div className="mt-6 rounded-xl border border-blue-100 bg-blue-50 p-4">
           <p className="text-xs font-semibold text-blue-900">
             Test Admin Account
           </p>
-          <p className="mt-2 text-xs text-gray-600">Email: admin@test.com</p>
-          <p className="mt-1 text-xs text-gray-600">Password: Admin@12345</p>
+
+          <p className="mt-2 text-xs text-gray-600">
+            Email: admin@test.com
+          </p>
+
+          <p className="mt-1 text-xs text-gray-600">
+            Password: Admin@12345
+          </p>
         </div>
       )}
     </AuthLayout>

@@ -1,12 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navigate, Routes, Route } from "react-router-dom";
 
-// =====================================================
-// ADMIN CONTEXT
-// =====================================================
-
+// IMPORT THE ADMIN PROVIDER
 import { AdminProvider } from "./Admin/AdminContext";
-
 // =====================================================
 // PUBLIC PAGES
 // =====================================================
@@ -31,7 +27,6 @@ import Gallery from "./Components/Gallery";
 // =====================================================
 
 import Login from "./Pages/Login";
-import Signup from "./Pages/Signup";
 
 // =====================================================
 // PUBLIC WEBSITE COMPONENTS
@@ -70,7 +65,6 @@ import DutyRoster from "./Employee/DutyRoster";
 // =====================================================
 // PUBLIC WEBSITE LAYOUT
 // =====================================================
-
 function PublicLayout({ children, role, onLogout }) {
   return (
     <>
@@ -85,129 +79,82 @@ function PublicLayout({ children, role, onLogout }) {
 }
 
 // =====================================================
-// READ SESSION FROM LOCAL STORAGE
-// =====================================================
-
-function getInitialSession() {
-  try {
-    const savedSession = localStorage.getItem("session");
-
-    if (!savedSession) {
-      return null;
-    }
-
-    const parsedSession = JSON.parse(savedSession);
-
-    // Basic validation
-    if (!parsedSession || !parsedSession.token || !parsedSession.role) {
-      localStorage.removeItem("session");
-      return null;
-    }
-
-    return parsedSession;
-  } catch (error) {
-    console.error("Failed to restore session:", error);
-
-    localStorage.removeItem("session");
-
-    return null;
-  }
-}
-
-// =====================================================
 // APP
 // =====================================================
 
 function App() {
-  // ---------------------------------------------------
-  // Restore session immediately from localStorage.
-  //
-  // NO API REQUEST IS MADE HERE.
-  // ---------------------------------------------------
+  // ===================================================
+  // SESSION
+  // ===================================================
 
-  const [session, setSession] = useState(getInitialSession);
+  const [session, setSession] = useState(() => {
+    const saved = localStorage.getItem("session");
+
+    if (!saved) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(saved);
+    } catch (error) {
+      console.error("Invalid session found in localStorage:", error);
+      localStorage.removeItem("session");
+      return null;
+    }
+  });
+
+  // ===================================================
+  // SAVE SESSION
+  // ===================================================
+
+  useEffect(() => {
+    if (session) {
+      localStorage.setItem("session", JSON.stringify(session));
+    } else {
+      localStorage.removeItem("session");
+    }
+  }, [session]);
 
   // ===================================================
   // LOGIN SUCCESS
   // ===================================================
 
-  const handleLoginSuccess = (loginData) => {
-    console.log("LOGIN SUCCESS DATA:", loginData);
+  function handleLoginSuccess(loginData) {
+    console.log("LOGIN DATA FROM LOGIN.JSX:", loginData);
 
-    const user = loginData?.user;
+    const user = loginData?.user || {
+      email: loginData?.email,
+      name: loginData?.name,
+      role: loginData?.role,
+    };
 
-    const token = loginData?.token;
-
-    const role = user?.role;
-
-    // -----------------------------------------------
-    // Validate login response
-    // -----------------------------------------------
-
-    if (!token) {
-      console.error("Login response does not contain a token:", loginData);
-
-      return;
-    }
-
-    if (!user) {
-      console.error("Login response does not contain user:", loginData);
-
-      return;
-    }
+    const role = user?.role || loginData?.role;
 
     if (!role) {
-      console.error("Login response does not contain role:", loginData);
-
+      console.error("Login response does not contain a role:", loginData);
       return;
     }
 
-    // -----------------------------------------------
-    // Create ONE consistent session
-    // -----------------------------------------------
-
     const newSession = {
-      token,
-      user,
-      role,
+      token: loginData?.token || null,
+      user: user,
+      role: role,
       signedInAt: Date.now(),
     };
 
-    // -----------------------------------------------
-    // Store session
-    // -----------------------------------------------
-
-    localStorage.setItem("session", JSON.stringify(newSession));
-
-    // Keep token available for Axios interceptor
-    localStorage.setItem("token", token);
-
-    // Optional compatibility
-    localStorage.setItem("user", JSON.stringify(user));
-
-    // -----------------------------------------------
-    // Update React state
-    // -----------------------------------------------
-
+    console.log("SESSION CREATED:", newSession);
     setSession(newSession);
-  };
+  }
 
   // ===================================================
   // LOGOUT
   // ===================================================
 
-  const handleLogout = () => {
+  function handleLogout() {
     console.log("Logging out...");
-
-    // Remove all authentication information
     localStorage.removeItem("session");
-    localStorage.removeItem("token");
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("user");
-
-    // Return application to logged-out state
     setSession(null);
-  };
+  }
 
   // ===================================================
   // ROUTES
@@ -216,16 +163,10 @@ function App() {
   return (
     <AdminProvider>
       <Routes>
-        {/* =================================================
-            ROOT
-        ================================================= */}
-
+        {/* ROOT → LOGIN */}
         <Route path="/" element={<Navigate to="/login" replace />} />
 
-        {/* =================================================
-            LOGIN
-        ================================================= */}
-
+        {/* LOGIN */}
         <Route
           path="/login"
           element={
@@ -233,7 +174,7 @@ function App() {
               session.role === "admin" ? (
                 <Navigate to="/admin" replace />
               ) : session.role === "employee" ? (
-                <Navigate to="/employee" replace />
+                <Navigate to="/home" replace />
               ) : (
                 <Navigate to="/login" replace />
               )
@@ -243,40 +184,7 @@ function App() {
           }
         />
 
-        {/* =================================================
-            SIGN UP
-        ================================================= */}
-
-        <Route
-          path="/signup"
-          element={
-            session ? (
-              session.role === "admin" ? (
-                <Navigate to="/admin" replace />
-              ) : session.role === "employee" ? (
-                <Navigate to="/employee" replace />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            ) : (
-              <Signup />
-            )
-          }
-        />
-
-        {/* =================================================
-            PUBLIC WEBSITE
-        ================================================= */}
-
-        <Route
-          path="/home"
-          element={
-            <PublicLayout role={session?.role} onLogout={handleLogout}>
-              <Home />
-            </PublicLayout>
-          }
-        />
-
+        {/* PUBLIC WEBSITE */}
         <Route
           path="/about"
           element={
@@ -340,10 +248,16 @@ function App() {
           }
         />
 
-        {/* =================================================
-            ADMIN PORTAL
-        ================================================= */}
+        <Route
+          path="/home"
+          element={
+            <PublicLayout role={session?.role} onLogout={handleLogout}>
+              <Home />
+            </PublicLayout>
+          }
+        />
 
+        {/* ADMIN PORTAL */}
         <Route
           path="/admin"
           element={
@@ -355,34 +269,20 @@ function App() {
           }
         >
           <Route index element={<AdminDashboard />} />
-
           <Route path="hero-slider" element={<HeroSliderAdmin />} />
-
           <Route path="about" element={<AboutAdmin />} />
-
           <Route path="services" element={<ServicesAdmin />} />
-
           <Route path="safety" element={<SafetyAdmin />} />
-
           <Route path="power-stations" element={<PowerStationAdmin />} />
-
           <Route path="gallery" element={<GalleryAdmin />} />
-
           <Route path="news" element={<NewsAdmin />} />
-
           <Route path="blog" element={<BlogAdmin />} />
-
           <Route path="careers" element={<CareerAdmin />} />
-
           <Route path="messages" element={<MessagesAdmin />} />
-
           <Route path="duty-roster" element={<DutyRosterAdmin />} />
         </Route>
 
-        {/* =================================================
-            EMPLOYEE PORTAL
-        ================================================= */}
-
+        {/* EMPLOYEE PORTAL */}
         <Route
           path="/employee"
           element={
@@ -394,14 +294,10 @@ function App() {
           }
         >
           <Route index element={<EmployeeDashboard />} />
-
           <Route path="duty-roster" element={<DutyRoster />} />
         </Route>
 
-        {/* =================================================
-            404
-        ================================================= */}
-
+        {/* 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AdminProvider>

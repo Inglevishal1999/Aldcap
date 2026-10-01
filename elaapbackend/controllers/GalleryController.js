@@ -1,58 +1,103 @@
-
 import fs from "fs";
 import path from "path";
+
 import GalleryItem from "../models/GalleryItem.js";
 
 // =====================================================
-// HELPER: Build MongoDB image path
+// GALLERY UPLOAD DIRECTORY
+// =====================================================
+
+const galleryUploadDir = path.join(
+  process.cwd(),
+  "uploads",
+  "gallery"
+);
+
+// =====================================================
+// BUILD IMAGE PATH
 // =====================================================
 
 const getImagePath = (filename) => {
-  return `/uploads/${filename}`;
+  return `/uploads/gallery/${filename}`;
 };
 
 // =====================================================
-// HELPER: Delete physical image
+// GET PHYSICAL IMAGE PATH
 // =====================================================
 
-const deleteImageFile = (imagePath) => {
-  if (!imagePath) return;
+const getPhysicalImagePath = (imagePath) => {
+  if (!imagePath) {
+    return null;
+  }
 
   const fileName = path.basename(imagePath);
 
-  const filePath = path.join(
-    process.cwd(),
-    "uploads",
+  return path.join(
+    galleryUploadDir,
     fileName
   );
+};
+
+// =====================================================
+// DELETE IMAGE FILE
+// =====================================================
+
+const deleteImageFile = (imagePath) => {
+  if (!imagePath) {
+    return;
+  }
+
+  const filePath =
+    getPhysicalImagePath(imagePath);
+
+  if (!filePath) {
+    return;
+  }
 
   try {
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
-      console.log("Image deleted:", filePath);
+
+      console.log(
+        "Image deleted:",
+        filePath
+      );
+    } else {
+      console.log(
+        "Image file not found:",
+        filePath
+      );
     }
   } catch (error) {
-    console.error("Error deleting image:", error.message);
+    console.error(
+      "Error deleting image:",
+      error.message
+    );
   }
 };
 
 // =====================================================
-// HELPER: Delete newly uploaded file
+// DELETE NEW UPLOADED FILE
 // =====================================================
 
 const deleteUploadedFile = (filename) => {
-  if (!filename) return;
+  if (!filename) {
+    return;
+  }
 
   const filePath = path.join(
-    process.cwd(),
-    "uploads",
+    galleryUploadDir,
     filename
   );
 
   try {
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
-      console.log("Uploaded file removed:", filePath);
+
+      console.log(
+        "Uploaded file removed:",
+        filePath
+      );
     }
   } catch (error) {
     console.error(
@@ -63,15 +108,19 @@ const deleteUploadedFile = (filename) => {
 };
 
 // =====================================================
+// GET ALL GALLERY ITEMS
 // GET /api/gallery
-// PUBLIC
 // =====================================================
 
-export const getGalleryItems = async (req, res) => {
+export const getGalleryItems = async (
+  req,
+  res
+) => {
   try {
-    const items = await GalleryItem.find()
-      .sort({ date: -1 })
-      .lean();
+    const items =
+      await GalleryItem.find()
+        .sort({ date: -1 })
+        .lean();
 
     return res.status(200).json({
       success: true,
@@ -86,27 +135,33 @@ export const getGalleryItems = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "Error fetching gallery items",
+      message:
+        "Error fetching gallery items",
       error: error.message,
     });
   }
 };
 
 // =====================================================
+// GET SINGLE GALLERY ITEM
 // GET /api/gallery/:id
-// PUBLIC
 // =====================================================
 
-export const getGalleryItemById = async (req, res) => {
+export const getGalleryItemById = async (
+  req,
+  res
+) => {
   try {
-    const item = await GalleryItem.findById(
-      req.params.id
-    ).lean();
+    const item =
+      await GalleryItem.findById(
+        req.params.id
+      ).lean();
 
     if (!item) {
       return res.status(404).json({
         success: false,
-        message: "Gallery item not found",
+        message:
+          "Gallery item not found",
       });
     }
 
@@ -122,74 +177,125 @@ export const getGalleryItemById = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "Error fetching gallery item",
+      message:
+        "Error fetching gallery item",
       error: error.message,
     });
   }
 };
 
 // =====================================================
+// CREATE GALLERY ITEM
 // POST /api/gallery
-// ADMIN ONLY
-// multipart/form-data
 // =====================================================
 
-export const createGalleryItem = async (req, res) => {
+export const createGalleryItem = async (
+  req,
+  res
+) => {
   try {
     const caption =
       typeof req.body.caption === "string"
         ? req.body.caption.trim()
         : "";
 
-    console.log("====================================");
-    console.log("CREATE GALLERY");
-    console.log("Caption:", caption);
-    console.log("File:", req.file);
-    console.log("====================================");
+    console.log(
+      "===================================="
+    );
 
-    // ---------------------------------------------
-    // Validate caption
-    // ---------------------------------------------
+    console.log(
+      "CREATE GALLERY"
+    );
+
+    console.log(
+      "Caption:",
+      caption
+    );
+
+    console.log(
+      "File:",
+      req.file
+    );
+
+    console.log(
+      "===================================="
+    );
+
+    // =================================================
+    // CAPTION VALIDATION
+    // =================================================
 
     if (!caption) {
       if (req.file) {
-        deleteUploadedFile(req.file.filename);
+        deleteUploadedFile(
+          req.file.filename
+        );
       }
 
       return res.status(400).json({
         success: false,
-        message: "Caption is required",
+        message:
+          "Caption is required",
       });
     }
 
-    // ---------------------------------------------
-    // Validate image
-    // ---------------------------------------------
+    // =================================================
+    // IMAGE VALIDATION
+    // =================================================
 
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: "Image file is required",
+        message:
+          "Image file is required",
       });
     }
 
-    // ---------------------------------------------
-    // Store only image path in MongoDB
-    // ---------------------------------------------
+    // =================================================
+    // PHYSICAL FILE CHECK
+    // =================================================
+
+    const physicalFilePath =
+      path.join(
+        galleryUploadDir,
+        req.file.filename
+      );
+
+    console.log(
+      "Physical image:",
+      physicalFilePath
+    );
+
+    console.log(
+      "Image exists:",
+      fs.existsSync(
+        physicalFilePath
+      )
+    );
+
+    // =================================================
+    // IMAGE URL
+    // =================================================
 
     const image = getImagePath(
       req.file.filename
     );
 
-    // ---------------------------------------------
-    // Create MongoDB record
-    // ---------------------------------------------
+    console.log(
+      "MongoDB image path:",
+      image
+    );
 
-    const item = await GalleryItem.create({
-      caption,
-      image,
-      date: new Date(),
-    });
+    // =================================================
+    // CREATE DATABASE RECORD
+    // =================================================
+
+    const item =
+      await GalleryItem.create({
+        caption,
+        image,
+        date: new Date(),
+      });
 
     console.log(
       "Gallery item created:",
@@ -198,7 +304,8 @@ export const createGalleryItem = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Gallery item created successfully",
+      message:
+        "Gallery item created successfully",
       data: item,
     });
   } catch (error) {
@@ -207,7 +314,6 @@ export const createGalleryItem = async (req, res) => {
       error
     );
 
-    // Remove image if database creation fails
     if (req.file) {
       deleteUploadedFile(
         req.file.filename
@@ -216,40 +322,60 @@ export const createGalleryItem = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "Error creating gallery item",
+      message:
+        "Error creating gallery item",
       error: error.message,
     });
   }
 };
 
 // =====================================================
+// UPDATE GALLERY ITEM
 // PUT /api/gallery/:id
-// ADMIN ONLY
-// multipart/form-data
-//
-// Supports:
-// 1. Caption only
-// 2. Caption + new image
 // =====================================================
 
-export const updateGalleryItem = async (req, res) => {
+export const updateGalleryItem = async (
+  req,
+  res
+) => {
   let newImageFilename = null;
 
   try {
-    console.log("====================================");
-    console.log("UPDATE GALLERY");
-    console.log("ID:", req.params.id);
-    console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
-    console.log("====================================");
+    console.log(
+      "===================================="
+    );
 
-    // ---------------------------------------------
-    // Find existing gallery item
-    // ---------------------------------------------
+    console.log(
+      "UPDATE GALLERY"
+    );
 
-    const existing = await GalleryItem.findById(
+    console.log(
+      "ID:",
       req.params.id
     );
+
+    console.log(
+      "BODY:",
+      req.body
+    );
+
+    console.log(
+      "FILE:",
+      req.file
+    );
+
+    console.log(
+      "===================================="
+    );
+
+    // =================================================
+    // FIND EXISTING ITEM
+    // =================================================
+
+    const existing =
+      await GalleryItem.findById(
+        req.params.id
+      );
 
     if (!existing) {
       if (req.file) {
@@ -260,25 +386,29 @@ export const updateGalleryItem = async (req, res) => {
 
       return res.status(404).json({
         success: false,
-        message: "Gallery item not found",
+        message:
+          "Gallery item not found",
       });
     }
 
-    // ---------------------------------------------
-    // Store newly uploaded filename
-    // ---------------------------------------------
+    // =================================================
+    // NEW IMAGE
+    // =================================================
 
     if (req.file) {
-      newImageFilename = req.file.filename;
+      newImageFilename =
+        req.file.filename;
     }
 
-    // ---------------------------------------------
-    // Caption
-    // ---------------------------------------------
+    // =================================================
+    // CAPTION
+    // =================================================
 
     const caption =
       req.body.caption !== undefined
-        ? String(req.body.caption).trim()
+        ? String(
+            req.body.caption
+          ).trim()
         : existing.caption;
 
     if (!caption) {
@@ -290,31 +420,29 @@ export const updateGalleryItem = async (req, res) => {
 
       return res.status(400).json({
         success: false,
-        message: "Caption is required",
+        message:
+          "Caption is required",
       });
     }
 
-    // ---------------------------------------------
-    // Build update
-    // ---------------------------------------------
+    // =================================================
+    // UPDATE DATA
+    // =================================================
 
     const updateData = {
       caption,
     };
 
-    // ---------------------------------------------
-    // If new image exists
-    // ---------------------------------------------
-
     if (req.file) {
-      updateData.image = getImagePath(
-        req.file.filename
-      );
+      updateData.image =
+        getImagePath(
+          req.file.filename
+        );
     }
 
-    // ---------------------------------------------
-    // Update MongoDB
-    // ---------------------------------------------
+    // =================================================
+    // UPDATE DATABASE
+    // =================================================
 
     const updatedItem =
       await GalleryItem.findByIdAndUpdate(
@@ -335,20 +463,24 @@ export const updateGalleryItem = async (req, res) => {
 
       return res.status(404).json({
         success: false,
-        message: "Gallery item not found",
+        message:
+          "Gallery item not found",
       });
     }
 
-    // ---------------------------------------------
-    // Delete old image ONLY after successful DB update
-    // ---------------------------------------------
+    // =================================================
+    // DELETE OLD IMAGE
+    // =================================================
 
     if (
       req.file &&
       existing.image &&
-      existing.image !== updatedItem.image
+      existing.image !==
+        updatedItem.image
     ) {
-      deleteImageFile(existing.image);
+      deleteImageFile(
+        existing.image
+      );
     }
 
     console.log(
@@ -358,7 +490,8 @@ export const updateGalleryItem = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Gallery item updated successfully",
+      message:
+        "Gallery item updated successfully",
       data: updatedItem,
     });
   } catch (error) {
@@ -366,10 +499,6 @@ export const updateGalleryItem = async (req, res) => {
       "Update gallery item error:",
       error
     );
-
-    // ---------------------------------------------
-    // If update failed, remove newly uploaded image
-    // ---------------------------------------------
 
     if (newImageFilename) {
       deleteUploadedFile(
@@ -379,53 +508,61 @@ export const updateGalleryItem = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "Error updating gallery item",
+      message:
+        "Error updating gallery item",
       error: error.message,
     });
   }
 };
 
 // =====================================================
+// DELETE GALLERY ITEM
 // DELETE /api/gallery/:id
-// ADMIN ONLY
 // =====================================================
 
-export const deleteGalleryItem = async (req, res) => {
+export const deleteGalleryItem = async (
+  req,
+  res
+) => {
   try {
     console.log(
       "Deleting gallery item:",
       req.params.id
     );
 
-    // ---------------------------------------------
-    // Find item
-    // ---------------------------------------------
+    // =================================================
+    // FIND ITEM
+    // =================================================
 
-    const item = await GalleryItem.findById(
-      req.params.id
-    );
+    const item =
+      await GalleryItem.findById(
+        req.params.id
+      );
 
     if (!item) {
       return res.status(404).json({
         success: false,
-        message: "Gallery item not found",
+        message:
+          "Gallery item not found",
       });
     }
 
-    // ---------------------------------------------
-    // Delete MongoDB record
-    // ---------------------------------------------
+    // =================================================
+    // DELETE DATABASE RECORD
+    // =================================================
 
     await GalleryItem.findByIdAndDelete(
       req.params.id
     );
 
-    // ---------------------------------------------
-    // Delete physical image
-    // ---------------------------------------------
+    // =================================================
+    // DELETE IMAGE
+    // =================================================
 
     if (item.image) {
-      deleteImageFile(item.image);
+      deleteImageFile(
+        item.image
+      );
     }
 
     console.log(
@@ -435,7 +572,8 @@ export const deleteGalleryItem = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Gallery item deleted successfully",
+      message:
+        "Gallery item deleted successfully",
     });
   } catch (error) {
     console.error(
@@ -445,9 +583,9 @@ export const deleteGalleryItem = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "Error deleting gallery item",
+      message:
+        "Error deleting gallery item",
       error: error.message,
     });
   }
 };
-

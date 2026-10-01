@@ -1,4 +1,3 @@
-
 import express from "express";
 
 import {
@@ -12,8 +11,9 @@ import {
 import {
   protect,
   adminOnly,
-  upload,
 } from "../middleware/authMiddleware.js";
+
+import upload from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
 
@@ -23,14 +23,15 @@ const router = express.Router();
 // PUBLIC
 // =====================================================
 
-router.get("/", getGalleryItems);
+router.get(
+  "/",
+  getGalleryItems
+);
 
 // =====================================================
 // CREATE GALLERY ITEM
 // POST /api/gallery
 // ADMIN ONLY
-// Content-Type: multipart/form-data
-// Field name: image
 // =====================================================
 
 router.post(
@@ -56,12 +57,6 @@ router.get(
 // UPDATE GALLERY ITEM
 // PUT /api/gallery/:id
 // ADMIN ONLY
-// Content-Type: multipart/form-data
-// Field name: image
-//
-// Supports:
-// - Caption only
-// - Caption + new image
 // =====================================================
 
 router.put(
