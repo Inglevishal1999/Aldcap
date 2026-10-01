@@ -19,14 +19,20 @@ const router = express.Router();
 
 // =====================================================
 // GET ALL GALLERY ITEMS
-// Public
+// GET /api/gallery
+// PUBLIC
 // =====================================================
+
 router.get("/", getGalleryItems);
 
 // =====================================================
 // CREATE GALLERY ITEM
-// Admin only
+// POST /api/gallery
+// ADMIN ONLY
+// Content-Type: multipart/form-data
+// Field name: image
 // =====================================================
+
 router.post(
   "/",
   protect,
@@ -37,8 +43,10 @@ router.post(
 
 // =====================================================
 // GET SINGLE GALLERY ITEM
-// Public
+// GET /api/gallery/:id
+// PUBLIC
 // =====================================================
+
 router.get(
   "/:id",
   getGalleryItemById
@@ -46,8 +54,16 @@ router.get(
 
 // =====================================================
 // UPDATE GALLERY ITEM
-// Admin only
+// PUT /api/gallery/:id
+// ADMIN ONLY
+// Content-Type: multipart/form-data
+// Field name: image
+//
+// Supports:
+// - Caption only
+// - Caption + new image
 // =====================================================
+
 router.put(
   "/:id",
   protect,
@@ -58,8 +74,10 @@ router.put(
 
 // =====================================================
 // DELETE GALLERY ITEM
-// Admin only
+// DELETE /api/gallery/:id
+// ADMIN ONLY
 // =====================================================
+
 router.delete(
   "/:id",
   protect,

@@ -4,11 +4,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // API CONFIG
 // ============================================================
 
-const API_ORIGIN =
-  import.meta.env.VITE_API_URL || "https://elaap-backend-live.onrender.com";
+const API_ORIGIN = import.meta.env.DEV
+  ? "http://localhost:5000"
+  : "https://elaap-backend-live.onrender.com";
 
 const API_BASE = `${API_ORIGIN}/api/blogs`;
-
 const PAGE_SIZE = 5;
 
 // ============================================================

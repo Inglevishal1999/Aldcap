@@ -7,9 +7,10 @@ import { fileURLToPath } from "url";
 
 import connectDB from "./config/db.js";
 
-// ==========================================
-// Routes
-// ==========================================
+// =====================================================
+// ROUTES
+// =====================================================
+
 import authRoutes from "./routes/authRoutes.js";
 import heroSliderRoutes from "./routes/heroSliderRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
@@ -20,26 +21,31 @@ import blogRoutes from "./routes/blogRoutes.js";
 import dutyRosterRoutes from "./routes/dutyRosterRoutes.js";
 import newsRoutes from "./routes/newsRoutes.js";
 
-// ==========================================
-// Environment Variables
-// ==========================================
+// =====================================================
+// ENVIRONMENT
+// =====================================================
+
 dotenv.config();
 
-// ==========================================
-// Express App
-// ==========================================
+// =====================================================
+// EXPRESS APP
+// =====================================================
+
 const app = express();
+
 const PORT = process.env.PORT || 5000;
 
-// ==========================================
-// __dirname for ES Modules
-// ==========================================
+// =====================================================
+// ES MODULE __dirname
+// =====================================================
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ==========================================
-// CORS Configuration
-// ==========================================
+// =====================================================
+// CORS
+// =====================================================
+
 const allowedOrigins = [
   "http://localhost:5173",
   "https://aldcap.vercel.app",
@@ -48,8 +54,8 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests without an Origin header
-      // (Postman, server-to-server requests, etc.)
+      // Allow requests without Origin
+      // Example: Postman/server-to-server
       if (!origin) {
         return callback(null, true);
       }
@@ -58,8 +64,14 @@ app.use(
         return callback(null, true);
       }
 
-      console.log("CORS blocked origin:", origin);
-      return callback(new Error("Not allowed by CORS"));
+      console.log(
+        "CORS blocked origin:",
+        origin
+      );
+
+      return callback(
+        new Error("Not allowed by CORS")
+      );
     },
 
     credentials: true,
@@ -80,93 +92,201 @@ app.use(
   })
 );
 
-// ==========================================
-// Body Parser Middleware
-// ==========================================
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// =====================================================
+// BODY PARSERS
+// =====================================================
 
-// ==========================================
-// Static Uploads Folder
-// ==========================================
+app.use(express.json());
+
 app.use(
-  "/uploads",
-  express.static(path.join(__dirname, "uploads"))
+  express.urlencoded({
+    extended: true,
+  })
 );
 
-// ==========================================
+// =====================================================
+// STATIC UPLOADS
+// =====================================================
+//
+// Physical file:
+// backend/uploads/example.jpg
+//
+// Browser URL:
+// /uploads/example.jpg
+//
+// Local:
+// http://localhost:5000/uploads/example.jpg
+//
+// Production:
+// https://elaap-backend-live.onrender.com/uploads/example.jpg
+// =====================================================
+
+app.use(
+  "/uploads",
+  express.static(
+    path.join(__dirname, "uploads")
+  )
+);
+
+// =====================================================
 // API STATUS
-// ==========================================
+// =====================================================
+
 app.get("/api/status", (req, res) => {
   res.status(200).json({
     success: true,
-    message: "ELAP backend is running perfectly!",
+    message:
+      "ELAP backend is running perfectly!",
   });
 });
 
-// ==========================================
+// =====================================================
 // API ROUTES
-// ==========================================
-app.use("/api/auth", authRoutes);
+// =====================================================
 
-app.use("/api/sliders", heroSliderRoutes);
+app.use(
+  "/api/auth",
+  authRoutes
+);
 
-app.use("/api/courses", courseRoutes);
+app.use(
+  "/api/sliders",
+  heroSliderRoutes
+);
 
-app.use("/api/about", aboutRoutes);
+app.use(
+  "/api/courses",
+  courseRoutes
+);
 
-app.use("/api/services", serviceRoutes);
+app.use(
+  "/api/about",
+  aboutRoutes
+);
 
-app.use("/api/news", newsRoutes);
+app.use(
+  "/api/services",
+  serviceRoutes
+);
 
-app.use("/api/gallery", galleryRoutes);
+app.use(
+  "/api/gallery",
+  galleryRoutes
+);
 
-app.use("/api/blogs", blogRoutes);
+app.use(
+  "/api/blogs",
+  blogRoutes
+);
 
-app.use("/api/news", newsRoutes);
+app.use(
+  "/api/news",
+  newsRoutes
+);
 
-app.use("/api/duty-roster", dutyRosterRoutes);
+app.use(
+  "/api/duty-roster",
+  dutyRosterRoutes
+);
 
-// ==========================================
-// 404 API Handler
-// ==========================================
+// =====================================================
+// API ROOT
+// =====================================================
+
+app.get("/api", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "ELAP API is working!",
+  });
+});
+
+// =====================================================
+// 404 HANDLER
+// =====================================================
+
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: `Route not found: ${req.method} ${req.originalUrl}`,
+    message:
+      `Route not found: ${req.method} ${req.originalUrl}`,
   });
 });
 
-// ==========================================
-// Error Handler
-// ==========================================
-app.use((err, req, res, next) => {
-  console.error("SERVER ERROR:", err);
+// =====================================================
+// ERROR HANDLER
+// =====================================================
 
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || "Internal server error",
-  });
-});
+app.use(
+  (err, req, res, next) => {
+    console.error(
+      "SERVER ERROR:",
+      err
+    );
 
-// ==========================================
-// Connect MongoDB + Start Server
-// ==========================================
+    res.status(
+      err.status || 500
+    ).json({
+      success: false,
+      message:
+        err.message ||
+        "Internal server error",
+    });
+  }
+);
+
+// =====================================================
+// CONNECT DATABASE + START SERVER
+// =====================================================
+
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log("======================================");
-      console.log("ELAP BACKEND STARTED");
-      console.log(`Server running on port: ${PORT}`);
-      console.log(`Status: /api/status`);
-      console.log(`Auth: /api/auth`);
-      console.log(`Blogs: /api/blogs`);
-      console.log(`Gallery: /api/gallery`);
-      console.log(`Duty Roster: /api/duty-roster`);
-      console.log("======================================");
+      console.log(
+        "======================================"
+      );
+
+      console.log(
+        "ELAP BACKEND STARTED"
+      );
+
+      console.log(
+        `Server running on port: ${PORT}`
+      );
+
+      console.log(
+        `Status: /api/status`
+      );
+
+      console.log(
+        `Auth: /api/auth`
+      );
+
+      console.log(
+        `Blogs: /api/blogs`
+      );
+
+      console.log(
+        `Gallery: /api/gallery`
+      );
+
+      console.log(
+        `Duty Roster: /api/duty-roster`
+      );
+
+      console.log(
+        `Uploads: /uploads`
+      );
+
+      console.log(
+        "======================================"
+      );
     });
   })
   .catch((err) => {
-    console.error("Database initialization failed:", err);
+    console.error(
+      "Database initialization failed:",
+      err
+    );
+
     process.exit(1);
   });

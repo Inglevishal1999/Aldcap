@@ -31,6 +31,7 @@ import Gallery from "./Components/Gallery";
 // =====================================================
 
 import Login from "./Pages/Login";
+import Signup from "./Pages/Signup";
 
 // =====================================================
 // PUBLIC WEBSITE COMPONENTS
@@ -238,6 +239,27 @@ function App() {
               )
             ) : (
               <Login onLoginSuccess={handleLoginSuccess} />
+            )
+          }
+        />
+
+        {/* =================================================
+            SIGN UP
+        ================================================= */}
+
+        <Route
+          path="/signup"
+          element={
+            session ? (
+              session.role === "admin" ? (
+                <Navigate to="/admin" replace />
+              ) : session.role === "employee" ? (
+                <Navigate to="/employee" replace />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            ) : (
+              <Signup />
             )
           }
         />

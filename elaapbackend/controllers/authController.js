@@ -1,144 +1,164 @@
-
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const loginUser = async (req, res) => {
-  const startTime = performance.now();
-
   try {
-    // Get login credentials
+    console.log("=================================");
+    console.log("LOGIN REQUEST RECEIVED");
+    console.log("LOGIN BODY:", req.body);
+    console.log("=================================");
+
     const { email, password } = req.body;
 
-    // Validate input
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Please provide both an email and password.",
+        message: "Email and password are required",
       });
     }
 
-    // Normalize email
+    console.log("STEP 1: Request body received");
+
     const normalizedEmail = email.trim().toLowerCase();
 
-    // Find user
-    const dbStart = performance.now();
+    console.log("STEP 2: Searching user:", normalizedEmail);
 
     const user = await User.findOne({
       email: normalizedEmail,
-    }).lean();
+    });
 
-    const dbTime = Math.round(
-      performance.now() - dbStart
-    );
+    console.log("STEP 3: User search completed");
 
-    console.log(`Login DB query: ${dbTime} ms`);
-
-    // User not found
     if (!user) {
+      console.log("USER NOT FOUND");
+
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password.",
+        message: "Invalid email or password",
       });
     }
 
-    // Verify password
-    const bcryptStart = performance.now();
+    console.log("USER FOUND:", user.email);
 
-    const isPasswordCorrect = await bcrypt.compare(
-      password,
-      user.password
-    );
+    console.log("STEP 4: Checking password");
 
-    const bcryptTime = Math.round(
-      performance.now() - bcryptStart
-    );
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    console.log(
-      `Password verification: ${bcryptTime} ms`
-    );
+    console.log("STEP 5: Password check completed");
 
-    // Wrong password
-    if (!isPasswordCorrect) {
+    if (!isPasswordValid) {
+      console.log("INVALID PASSWORD");
+
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password.",
+        message: "Invalid email or password",
       });
     }
 
-    // Make sure JWT secret exists
-    if (!process.env.JWT_SECRET) {
-      console.error(
-        "JWT_SECRET is missing from environment variables."
-      );
+    console.log("PASSWORD CORRECT");
 
-      return res.status(500).json({
-        success: false,
-        message:
-          "Authentication service is not configured correctly.",
-      });
-    }
-
-    // Generate JWT
-    const tokenStart = performance.now();
+    console.log("STEP 6: Creating token");
 
     const token = jwt.sign(
       {
         id: user._id,
+        email: user.email,
         role: user.role,
       },
       process.env.JWT_SECRET,
       {
         expiresIn: "1d",
-      }
+      },
     );
 
-    const tokenTime = Math.round(
-      performance.now() - tokenStart
-    );
+    console.log("STEP 7: Token created");
 
-    console.log(
-      `JWT generation: ${tokenTime} ms`
-    );
-
-    // Total controller time
-    const totalTime = Math.round(
-      performance.now() - startTime
-    );
-
-    console.log(
-      `Total login controller time: ${totalTime} ms`
-    );
-
-    // Send response
     return res.status(200).json({
       success: true,
       message: "Access granted. Login successful.",
       token,
-
       user: {
         id: user._id,
+        name: user.name,
         email: user.email,
         role: user.role,
       },
     });
   } catch (error) {
-    const totalTime = Math.round(
-      performance.now() - startTime
-    );
-
-    console.error(
-      "Login verification error:",
-      error
-    );
-
-    console.error(
-      `Login failed after: ${totalTime} ms`
-    );
+    console.error("LOGIN ERROR:", error);
 
     return res.status(500).json({
       success: false,
-      message: "Unable to process login request.",
+      message: "Server error during login",
+      error: error.message,
+    });
+  }
+};
+
+export const registerUser = async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Name, email and password are required",
+      });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const existingUser = await User.findOne({
+      email: normalizedEmail,
+    });
+
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: "User already exists",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      name: name.trim(),
+      email: normalizedEmail,
+      password: hashedPassword,
+      role: role || "employee",
+    });
+
+    const token = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d",
+      },
+    );
+
+    return res.status(201).json({
+      success: true,
+      message: "Registration successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error("Register error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server error during registration",
+      error: error.message,
     });
   }
 };

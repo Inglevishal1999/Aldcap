@@ -1,10 +1,18 @@
+
 import express from "express";
-// Changed 'login' to 'loginUser' to match your controller name exactly
-import { loginUser } from "../controllers/authController.js";
+
+import {
+  loginUser,
+  registerUser,
+} from "../controllers/authController.js";
 
 const router = express.Router();
 
-// POST /api/auth/login
+// Login
 router.post("/login", loginUser);
 
+// Registration
+router.post("/register", registerUser);
+
 export default router;
+

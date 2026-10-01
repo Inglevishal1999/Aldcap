@@ -1,14 +1,22 @@
+
 import axios from "axios";
 
 // =====================================================
 // API CONFIGURATION
 // =====================================================
 
-const API = axios.create({
-  baseURL: "https://elaap-backend-live.onrender.com/api",
+// Automatically use:
+// Local development → http://localhost:5000/api
+// Production       → https://elaap-backend-live.onrender.com/api
 
-  // Normal API requests should not wait 60 seconds.
-  // Render cold starts should be handled separately.
+const API_BASE_URL = import.meta.env.DEV
+  ? "http://localhost:5000/api"
+  : "https://elaap-backend-live.onrender.com/api";
+
+const API = axios.create({
+  baseURL: API_BASE_URL,
+
+  // 30 seconds
   timeout: 30000,
 
   headers: {
@@ -25,6 +33,7 @@ API.interceptors.request.use(
     // -------------------------------------------------
     // Get authentication token
     // -------------------------------------------------
+
     const token =
       localStorage.getItem("token") ||
       localStorage.getItem("authToken");
@@ -32,6 +41,7 @@ API.interceptors.request.use(
     // -------------------------------------------------
     // Add authentication header
     // -------------------------------------------------
+
     if (token) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
@@ -40,9 +50,10 @@ API.interceptors.request.use(
     // -------------------------------------------------
     // FormData
     //
-    // Never manually set Content-Type for FormData.
-    // Axios/browser will create the correct boundary.
+    // Don't manually set Content-Type.
+    // Axios/browser creates the multipart boundary.
     // -------------------------------------------------
+
     if (config.data instanceof FormData) {
       delete config.headers["Content-Type"];
       delete config.headers["content-type"];
@@ -50,6 +61,7 @@ API.interceptors.request.use(
 
     return config;
   },
+
   (error) => Promise.reject(error)
 );
 
@@ -73,7 +85,9 @@ API.interceptors.response.use(
       // -----------------------------------------------
 
       if (status === 401) {
-        console.warn("Session expired or token is invalid.");
+        console.warn(
+          "Session expired or token is invalid."
+        );
 
         localStorage.removeItem("token");
         localStorage.removeItem("authToken");
@@ -85,7 +99,7 @@ API.interceptors.response.use(
       }
 
       // -----------------------------------------------
-      // Other server errors
+      // Server errors
       // -----------------------------------------------
 
       if (status >= 500) {
